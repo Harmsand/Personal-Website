@@ -1,0 +1,309 @@
+---
+import Base from '../../layouts/Base.astro';
+import { SITE } from '../../config';
+
+const title = `Fireside: how far one product manager can take real code | ${SITE.name}`;
+const description =
+  'Building a multi-company software product end to end on my own, with an AI-native toolchain and the guardrails I would expect from an engineering team.';
+
+const stack = [
+  ['Claude, in chat', 'Architect, designer and QA reviewer. Planning, trade-offs, user stories and reviewing finished work.'],
+  ['Claude Code in Cursor', 'The engineer. It reads the whole codebase, writes and edits files, runs commands and writes database migrations.'],
+  ['Linear', 'Milestones and user stories with acceptance criteria. Connected to Claude, so stories were written straight from planning conversations.'],
+  ['Next.js, TypeScript, Tailwind, shadcn/ui', 'The app and its interface.'],
+  ['Supabase', 'Postgres database, sign-in and file storage, with row-level security.'],
+  ['Vercel', 'Hosting. Every push to the main branch deploys automatically.'],
+  ['GitHub', 'Code, history, branches and the project documentation.'],
+  ['Sentry', 'Error monitoring for the running app.'],
+];
+
+const guardrails = [
+  ['Each company’s data is walled off', 'Row-level security is on for every table by default, so one company can’t read another’s data even if the app code has a bug.'],
+  ['No secrets in the code', 'Keys live in environment files git never tracks. The app only uses the public key; the master database key never left Supabase.'],
+  ['Database changes are versioned', 'Every schema change is a migration file in the repository, so the database can be rebuilt and every change can be reviewed.'],
+  ['Types come from the database', 'TypeScript types are generated from the schema, so code that misuses a table fails before it runs.'],
+  ['Checks run before every commit', 'Formatting and lint checks run automatically. A commit that fails them doesn’t go in.'],
+  ['Errors get reported', 'Sentry captures errors from the running app instead of waiting for someone to complain.'],
+  ['Three branches', 'Work happens on dev, gets checked on staging, and only main reaches production.'],
+  ['One data layer', 'Every database, sign-in and storage call goes through one folder, so the provider can be swapped, for example for Canadian hosting, without rewriting the app.'],
+  ['Privacy designed in', 'Canadian privacy law shaped sign-up from day one, using Quebec’s Law 25 as the strictest bar: explicit consent, recorded with a timestamp.'],
+  ['Decisions written down', 'Each significant technical choice has a decision record in the repository: what was chosen, what else was considered, and why.'],
+  ['Production stays dark', 'The pipeline deploys to a live address, but I held back the production keys so nobody could sign up before the product was ready.'],
+];
+
+const steps = [
+  ['Plan', 'Decide what to build and why, with Claude as architect or designer.'],
+  ['Write it down', 'User stories with acceptance criteria go into Linear, under a milestone.'],
+  ['Build', 'Claude Code reads the story and the codebase, then writes the code, migrations and docs.'],
+  ['Check', 'I test against the acceptance criteria, with Claude as QA suggesting edge cases. A story closes only when every criterion is met.'],
+  ['Ship', 'Commit, the checks run, push, Vercel deploys.'],
+];
+
+const lessons = [
+  [
+    'A check that passed wasn’t protecting anything',
+    'Route protection looked right when I clicked through it. During a hardening pass, Claude Code found the file wasn’t wired up the way the framework expected after a Next.js rename, and fixed it. Clicking through isn’t proof. Automated tests are the next guardrail I’d add.',
+  ],
+  [
+    'Copy and paste was the bottleneck',
+    'At first I pasted code from chat into files by hand, which produced stray files and commands typed into the wrong terminal. Moving to Claude Code, which edits the repository directly, removed most of that.',
+  ],
+  [
+    'Two agents, one backlog',
+    'Claude Code and the planning chat both wrote the second milestone’s stories into Linear, and I ended up with duplicates. One agent should own the backlog.',
+  ],
+  [
+    'Built isn’t the same as done',
+    'The second milestone was built in one autonomous run. I haven’t tested it against its criteria yet, so I don’t count it as finished.',
+  ],
+];
+---
+
+<Base title={title} description={description}>
+  <article>
+    <header class="intro container">
+      <p class="crumb"><a href="/#projects">Projects</a></p>
+      <h1>Fireside: how far can one product manager take real code?</h1>
+      <p class="standfirst">
+        I set out to build a real multi-company software product end to end, on my own, with an AI-native toolchain and the
+        guardrails I’d expect from a professional engineering team.
+      </p>
+      <dl class="facts">
+        <div><dt>My role</dt><dd>Product manager, and the only person on the project</dd></div>
+        <div><dt>Team</dt><dd>Claude as architect, engineer, designer and QA</dd></div>
+        <div><dt>When</dt><dd>March 2026</dd></div>
+        <div><dt>Status</dt><dd>Foundation running through a production pipeline. Company accounts built. Video, live questions and takeaways designed, not built.</dd></div>
+      </dl>
+      <a class="btn" href="/fireside/">Open the demo</a>
+    </header>
+
+    <section class="sec">
+      <div class="container grid">
+        <h2>The question</h2>
+        <div class="body">
+          <p class="prose">
+            I lead product teams, and I wanted to know first-hand what AI changes about building software. Not a mock-up or a
+            no-code prototype: real code in a real repository, deployed through a real pipeline, held to the standards I’d
+            expect from an engineering team.
+          </p>
+          <p class="prose">
+            I came in with no coding background. The rule was simple. I made every product decision. Claude did the technical
+            work. Nothing counted as done until I had checked it against its acceptance criteria.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec tint">
+      <div class="container grid">
+        <h2>The product</h2>
+        <div class="body">
+          <p class="prose">
+            Companies bring in outside speakers on topics staff ask for: psychological safety, resilience, inclusion, AI at work.
+            Each booking means finding the speaker, usually through an agency, then a contract, a content meeting, a technical
+            rehearsal, a moderator and script, registration and promotion, recording rights afterwards, and tracking who came.
+            For the next speaker, it all starts again.
+          </p>
+          <p class="prose">
+            Fireside is a subscription where many companies share the same live speakers. The platform handles booking and
+            production. Attendees ask questions live and get a takeaway sheet written around their own goals. HR gets
+            attendance reporting to show leadership it was worth it.
+          </p>
+          <p class="prose">
+            Before building, I compared learning libraries, wellness platforms, webinar and event tools, and speaker bureaus.
+            Each covers part of this. None combine live curated speakers, handled logistics, a subscription and follow-up
+            written for each person.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec">
+      <div class="container grid">
+        <h2>The toolchain</h2>
+        <div class="body rows">
+          {stack.map(([name, what]) => (
+            <div class="row">
+              <h3>{name}</h3>
+              <p>{what}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section class="sec tint">
+      <div class="container grid">
+        <h2>The guardrails</h2>
+        <div class="body">
+          <p class="prose lead">
+            Speed was never the hard part. The question was whether one person could move fast without leaving the kind of
+            mess an engineering team would have to clean up later. These are the rules the codebase runs on.
+          </p>
+          <div class="rows">
+            {guardrails.map(([name, what]) => (
+              <div class="row">
+                <h3>{name}</h3>
+                <p>{what}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec">
+      <div class="container grid">
+        <h2>How the work ran</h2>
+        <div class="body">
+          <ol class="steps">
+            {steps.map(([name, what], i) => (
+              <li>
+                <span class="sn">{i + 1}</span>
+                <div>
+                  <h3>{name}</h3>
+                  <p>{what}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+          <p class="prose">
+            In the first long session I set up the development environment from nothing and shipped the foundation:
+            sign-up with consent, sign-in, password reset, protected pages, four user roles and a dashboard for each.
+            A hardening pass followed, adding migrations, error monitoring, generated types, commit checks and decision
+            records.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec tint">
+      <div class="container grid">
+        <h2>What went wrong</h2>
+        <div class="body rows">
+          {lessons.map(([name, what]) => (
+            <div class="row">
+              <h3>{name}</h3>
+              <p>{what}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section class="sec">
+      <div class="container grid">
+        <h2>Where it stands</h2>
+        <div class="body rows">
+          <div class="row">
+            <h3>Built and tested</h3>
+            <p>Sign-up with recorded consent, sign-in, password reset, protected pages, four roles and role-specific dashboards, deployed through the production pipeline.</p>
+          </div>
+          <div class="row">
+            <h3>Built, not yet tested</h3>
+            <p>Company accounts, email invites with expiring links, joining from an invite, user management for company admins, and a cross-company view for platform admins.</p>
+          </div>
+          <div class="row">
+            <h3>Designed, not built</h3>
+            <p>Live video, live questions with voting and moderation, personal takeaway sheets, engagement reporting and billing. The demo shows these with made-up data.</p>
+          </div>
+          <div class="row">
+            <h3>Left open on purpose</h3>
+            <p>Pricing. It needs research with buyers before anything goes into the billing system.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec tint">
+      <div class="container grid">
+        <h2>What it showed me</h2>
+        <div class="body">
+          <p class="prose">
+            The bottleneck moved. Writing code stopped being the slow part. Deciding what to build, writing it down clearly
+            enough to build from, and checking that the result was right became the whole job. Those are product skills.
+          </p>
+          <p class="prose">
+            The guardrails are what made the speed safe. Row-level security, versioned migrations and commit checks catch the
+            mistakes a fast-moving agent makes, the same way they catch a fast-moving engineer’s.
+          </p>
+          <p class="prose">
+            It doesn’t replace an engineering team for a product with paying customers. It changes how much one person can
+            build, prove and learn before hiring that team.
+          </p>
+          <a class="btn" href="/fireside/">Open the demo</a>
+        </div>
+      </div>
+    </section>
+  </article>
+</Base>
+
+<style>
+  .intro { padding-block: 4rem 3.5rem; max-width: 72rem; }
+  .crumb { margin: 0 0 1.25rem; font-size: 0.9375rem; }
+  .crumb a { color: var(--muted); }
+  .intro h1 {
+    font-size: clamp(2rem, 4.2vw, 3rem);
+    line-height: 1.08;
+    letter-spacing: -0.015em;
+    max-width: 20ch;
+  }
+  .standfirst { font-size: 1.25rem; line-height: 1.5; max-width: 40rem; margin: 1.25rem 0 0; }
+
+  .facts {
+    margin: 2.25rem 0 2rem;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    column-gap: 2rem;
+    border-top: 2px solid var(--ink);
+    padding-top: 1rem;
+    max-width: 64rem;
+  }
+  .facts dt { font-weight: 600; font-size: 0.9375rem; }
+  .facts dd { margin: 0.25rem 0 0; color: var(--muted); font-size: 0.9375rem; line-height: 1.45; }
+
+  .sec { padding-block: 4rem; }
+  .sec.tint { background: var(--surface); }
+  .grid { display: grid; grid-template-columns: 14rem minmax(0, 1fr); column-gap: 3rem; }
+  .grid h2 { font-size: 1.75rem; line-height: 1.15; }
+
+  .prose { max-width: 40rem; margin: 0 0 1rem; font-size: 1.125rem; line-height: 1.6; }
+  .prose:last-child { margin-bottom: 0; }
+  .lead { margin-bottom: 2rem; }
+
+  .rows .row {
+    display: grid;
+    grid-template-columns: 14rem minmax(0, 1fr);
+    column-gap: 2rem;
+    padding-block: 1.25rem;
+    border-top: 1px solid var(--border);
+  }
+  .rows .row:first-child { padding-top: 0; border-top: 0; }
+  .row h3 { font-size: 1.0625rem; line-height: 1.35; }
+  .row p { margin: 0; max-width: 38rem; }
+
+  .steps { list-style: none; margin: 0 0 2.5rem; padding: 0; display: grid; gap: 1.25rem; max-width: 42rem; }
+  .steps li { display: grid; grid-template-columns: 2.5rem minmax(0, 1fr); gap: 1rem; align-items: start; }
+  .sn {
+    width: 2.5rem; height: 2.5rem; display: grid; place-items: center;
+    border: 2px solid var(--ink); font-family: var(--font-head); font-weight: 600;
+  }
+  .steps li:last-child .sn { border-color: var(--red); color: var(--red); }
+  .steps h3 { font-size: 1.125rem; line-height: 1.3; }
+  .steps p { margin: 0.25rem 0 0; }
+
+  .body .btn { margin-top: 1.5rem; }
+
+  @media (max-width: 60rem) {
+    .facts { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 1.25rem; }
+  }
+  @media (max-width: 52rem) {
+    .grid { grid-template-columns: 1fr; row-gap: 1.5rem; }
+    .intro { padding-block: 3rem 2.5rem; }
+  }
+  @media (max-width: 40rem) {
+    .rows .row { grid-template-columns: 1fr; row-gap: 0.4rem; }
+    .facts { grid-template-columns: 1fr; }
+    .sec { padding-block: 3rem; }
+  }
+</style>

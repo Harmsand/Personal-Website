@@ -32,6 +32,7 @@ const projects: {
   linkText?: string;
   image?: string;
   imageAlt?: string;
+  secondary?: { href: string; text: string };
 }[] = [
   {
     title: 'Document intelligence for a workers\' compensation insurer',
@@ -41,6 +42,20 @@ const projects: {
       'I own the product as part of the portfolio I lead, covering document classification, OCR, the uploader and the format transformer.',
     result:
       'It is on track to turn nearly a million faxes a year into fielded information staff can act on, with less manual handling and lower cost.',
+  },
+  {
+    title: 'Fireside: how far one product manager can take real code',
+    what:
+      'Companies pay to book one outside speaker for one talk, then repeat the search, contract and production for the next. Fireside is a subscription where many companies share the same live speakers, with live questions, a takeaway sheet written for each attendee, and attendance reporting for HR.',
+    did:
+      'I built it end to end on my own as an exercise in AI-native development: real code, a real database and a production pipeline, with Claude as architect, engineer, designer and QA, and me making every product call. The work ran on the guardrails I would expect from an engineering team, including row-level security, versioned migrations, commit checks, error monitoring and written decision records.',
+    result:
+      'The foundation is built and tested, company accounts are built, and the rest is designed. The demo shows the full product with made-up data; the case study covers how it was built and what went wrong.',
+    href: '/projects/fireside/',
+    linkText: 'Read the case study',
+    secondary: { href: '/fireside/', text: 'Open the demo' },
+    image: '/fireside/preview.jpg',
+    imageAlt: 'The Fireside live session screen: a speaker on stage with live captions, and audience questions ranked by votes.',
   },
   {
     title: 'Baseline: a preventive health dashboard',
@@ -153,6 +168,7 @@ const linkedinIsButton = !SITE.email && !!SITE.linkedin;
                 <p>{p.did}</p>
                 <p>{p.result}</p>
                 {p.href && <a class="btn" href={p.href}>{p.linkText ?? 'See the project'}</a>}
+                {p.secondary && <a class="also" href={p.secondary.href}>{p.secondary.text}</a>}
               </article>
             ))}
           </div>
@@ -272,6 +288,7 @@ const linkedinIsButton = !SITE.email && !!SITE.linkedin;
   .project { max-width: 40rem; padding-bottom: 3rem; }
   .project + .project { border-top: 1px solid var(--border); padding-top: 3rem; }
   .project .btn { margin-top: 0.75rem; }
+  .project .also { display: inline-block; margin: 0.75rem 0 0 1.25rem; font-weight: 500; }
   .shot {
     display: block;
     aspect-ratio: 16 / 10;
