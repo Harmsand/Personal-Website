@@ -1,6 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
 import { SITE } from '../../config';
+import ArchDiagram from '../../components/ArchDiagram.astro';
 
 const title = `Fireside: how far one product manager can take real code | ${SITE.name}`;
 const description =
@@ -56,6 +57,83 @@ const lessons = [
     'Built isn’t the same as done',
     'The second milestone was built in one autonomous run. I haven’t tested it against its criteria yet, so I don’t count it as finished.',
   ],
+];
+// Diagram data. Each item is a zone (trust boundary), a full-width node, or a connector.
+// Node tuple: [title, detail, external?, span?]
+type Node = [string, string, boolean?, number?];
+type Item =
+  | { kind: 'zone'; title: string; cols: number; seq?: boolean; nodes: Node[] }
+  | { kind: 'node'; node: Node }
+  | { kind: 'arrow' }
+  | { kind: 'gap' };
+
+const runtime: Item[] = [
+  { kind: 'zone', title: 'Public internet: people and customer systems', cols: 4, nodes: [
+    ['Attendees', 'Web and mobile', true], ['HR admins', 'Console, reports', true],
+    ['Speakers', 'Studio, live questions', true], ['Customer identity provider', 'SSO, user sync', true],
+  ] },
+  { kind: 'arrow' },
+  { kind: 'zone', title: 'Edge', cols: 3, nodes: [
+    ['CDN and web firewall', 'TLS, rate limits, bot defence', false, 2], ['Video delivery', 'Signed, expiring links', true],
+  ] },
+  { kind: 'arrow' },
+  { kind: 'zone', title: 'Application: Canadian region, private network', cols: 3, nodes: [
+    ['Web app and API', 'Checks every request'], ['Identity (CIAM)', 'SSO, MFA, roles'], ['Realtime gateway', 'Live questions, polls'],
+    ['Core services, one codebase', 'Tenants, bookings, sessions, reporting', false, 2], ['Job queue and workers', 'Takeaways, email'],
+  ] },
+  { kind: 'arrow' },
+  { kind: 'zone', title: 'Data: Canadian region, encrypted, never public', cols: 4, nodes: [
+    ['Postgres', 'Row-level security by company'], ['Redis', 'Cache, pub/sub'],
+    ['Object storage', 'Recordings, files'], ['Analytics', 'HR reporting'],
+  ] },
+  { kind: 'gap' },
+  { kind: 'zone', title: 'Third parties: called from the application only, under contract', cols: 4, nodes: [
+    ['Video platform', 'Live and on-demand', true], ['Payments', 'Subscriptions', true],
+    ['LLM API', 'Zero data retention', true], ['Email', 'Transactional', true],
+  ] },
+  { kind: 'gap' },
+  { kind: 'node', node: ['Across every zone: security and operations', 'Secrets manager and managed keys, per-company audit log, least-privilege access, logs and alerts, point-in-time backups with tested restores, a second region for recovery.'] },
+];
+
+const delivery: Item[] = [
+  { kind: 'zone', title: 'From story to release', cols: 5, seq: true, nodes: [
+    ['Linear', 'Story with criteria'], ['Claude Code', 'Writes the change'], ['Pull request', 'Human review'],
+    ['CI checks', 'Tests, scans, types'], ['Deploy', 'Gated release'],
+  ] },
+  { kind: 'arrow' },
+  { kind: 'zone', title: 'Environments: separate databases, keys and users', cols: 3, seq: true, nodes: [
+    ['Development', 'Made-up data only'], ['Staging', 'Mirrors production'], ['Production', 'Approval to release'],
+  ] },
+];
+
+const ai: Item[] = [
+  { kind: 'zone', title: 'Inputs, per session', cols: 4, nodes: [
+    ['Transcript', 'From the video'], ['Slides and notes', 'From the speaker'],
+    ['Attendee goals', 'Profile and per session'], ['Live questions', 'What they asked'],
+  ] },
+  { kind: 'arrow' },
+  { kind: 'node', node: ['Session knowledge base', 'Chunked and embedded in Postgres, filtered by company on every query.'] },
+  { kind: 'arrow' },
+  { kind: 'zone', title: 'Takeaway workflow: runs for each attendee after the session', cols: 4, seq: true, nodes: [
+    ['Retrieve', 'What matches their goals'], ['Draft', 'Personal actions'],
+    ['Check', 'Grounded in the talk, no personal data'], ['Deliver', 'Sheet, then a 30-day nudge'],
+  ] },
+  { kind: 'arrow' },
+  { kind: 'zone', title: 'AI gateway: the only way any feature reaches a model', cols: 3, nodes: [
+    ['Prompt registry', 'Versioned and reviewed'], ['Model router', 'Model per task, with fallback'], ['Evaluation gate', 'Blocks a swap that scores worse'],
+    ['Frontier model', 'Hosted API', true], ['Canadian-hosted model', 'For data residency', true], ['Open model', 'Self-hosted', true],
+  ] },
+];
+
+const aiUses = [
+  ['Question moderation and grouping', 'Merges duplicate questions, flags unsafe ones and shows the speaker themes instead of two hundred separate questions. Saves real moderator time.'],
+  ['Speaker briefing', 'Before the talk, the speaker gets an anonymised summary of what the audience’s companies want from it. A content library can’t do this.'],
+  ['ROI summary for HR', 'Turns attendance and takeaway data into a plain-language quarterly summary HR can take to its executives. This is what drives renewals.'],
+  ['30-day follow-up', 'Asks attendees whether they used their actions. The answers are the only real evidence of return on the spend.'],
+  ['Chapters and search', 'Automatic chapters and highlights for recordings, and questions answered from a session’s own content.'],
+  ['Captions and translation', 'Bought from the video platform, not built.'],
+  ['Booking agent', 'The one real agent: matches speakers to demand, checks availability and drafts contracts. A person approves anything that commits money.'],
+  ['Left out on purpose', 'AI speaker avatars and generated session content. Customers pay for real experts.'],
 ];
 ---
 
@@ -114,6 +192,60 @@ const lessons = [
             Each covers part of this. None combine live curated speakers, handled logistics, a subscription and follow-up
             written for each person.
           </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec">
+      <div class="container grid">
+        <h2>Target architecture</h2>
+        <div class="body">
+          <p class="prose">
+            What exists today is a foundation. This is how I would design Fireside for a commercial launch, drawn the way a
+            solutions architect would: by trust boundary, so it is clear what is public, what is private and which outside
+            parties ever see customer data.
+          </p>
+          <p class="prose">
+            Three choices carry most of the weight. Each company’s data is kept apart by row-level security in the database,
+            so a bug in the app can’t leak one company’s data to another. Data stays in a Canadian region, and outside services
+            are only called from the server, which is how the design answers PIPEDA and Quebec’s Law 25. And the core is one
+            codebase, not microservices, because that is the right call for a product at this stage.
+          </p>
+          <ArchDiagram items={runtime} label="Fireside target runtime architecture, by trust boundary" />
+          <p class="prose sub">
+            How code gets to production is a separate view. The rule that matters is that the environments share nothing:
+            no database, no keys and no users.
+          </p>
+          <ArchDiagram items={delivery} label="Fireside delivery pipeline and environments" />
+        </div>
+      </div>
+    </section>
+
+    <section class="sec tint">
+      <div class="container grid">
+        <h2>Where AI fits</h2>
+        <div class="body">
+          <p class="prose">
+            The takeaway sheet is the product’s main AI feature, and it is deliberately not an agent. It is a fixed workflow
+            that runs the same four steps for every attendee, which makes it predictable, testable and cheap. Agents, where the
+            model plans its own steps, are kept for open-ended jobs.
+          </p>
+          <p class="prose">
+            The model has to be swappable. No feature calls a model directly. Every request goes through one AI gateway that
+            holds versioned prompts, picks the model for each task and runs a set of known-good test cases. A new model goes
+            live only if it scores as well as the current one. Personal details are removed before any prompt leaves the
+            platform.
+          </p>
+          <ArchDiagram items={ai} label="Fireside AI architecture for personalised takeaways" externalLabel="Swappable model provider" />
+          <p class="prose sub">Other uses, ranked by the value they add:</p>
+          <div class="rows">
+            {aiUses.map(([name, what]) => (
+              <div class="row">
+                <h3>{name}</h3>
+                <p>{what}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>
@@ -270,6 +402,8 @@ const lessons = [
   .prose { max-width: 40rem; margin: 0 0 1rem; font-size: 1.125rem; line-height: 1.6; }
   .prose:last-child { margin-bottom: 0; }
   .lead { margin-bottom: 2rem; }
+  .sub { margin-top: 2.5rem; }
+  .body > .rows { margin-top: 1.5rem; }
 
   .rows .row {
     display: grid;

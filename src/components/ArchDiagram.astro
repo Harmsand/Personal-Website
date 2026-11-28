@@ -1,0 +1,120 @@
+---
+// Responsive architecture diagram built from HTML, so it reflows on phones
+// instead of shrinking an SVG to unreadable text.
+type Node = [string, string, boolean?, number?];
+type Item =
+  | { kind: 'zone'; title: string; cols: number; seq?: boolean; nodes: Node[] }
+  | { kind: 'node'; node: Node }
+  | { kind: 'arrow' }
+  | { kind: 'gap' };
+
+interface Props {
+  items: Item[];
+  label: string;
+  caption?: string;
+  externalLabel?: string;
+}
+const { items, label, caption, externalLabel = 'Outside party' } = Astro.props;
+const hasExt = items.some((i) => i.kind === 'zone' && i.nodes.some((n) => n[2]));
+---
+
+<figure class="arch" aria-label={label}>
+  {items.map((item) => {
+    if (item.kind === 'arrow') return <div class="to" aria-hidden="true"></div>;
+    if (item.kind === 'gap') return <div class="gap" aria-hidden="true"></div>;
+    if (item.kind === 'node') {
+      const [t, d] = item.node;
+      return (
+        <div class="n solo">
+          <strong>{t}</strong>
+          <span>{d}</span>
+        </div>
+      );
+    }
+    return (
+      <section class="zone">
+        <p class="zt">{item.title}</p>
+        <ol class:list={['nodes', { seq: item.seq, c3: item.cols === 3 }]} style={`--c:${item.cols}`}>
+          {item.nodes.map(([t, d, ext, span]) => (
+            <li class:list={['n', { ext }]} style={span ? `--s:${span}` : undefined}>
+              <strong>{t}</strong>
+              <span>{d}</span>
+            </li>
+          ))}
+        </ol>
+      </section>
+    );
+  })}
+  <figcaption>
+    <span class="key"><i class="k own"></i>Fireside runs it</span>
+    {hasExt && <span class="key"><i class="k ext"></i>{externalLabel}</span>}
+    <span class="key"><i class="k bnd"></i>Trust boundary</span>
+    {caption && <span class="cap">{caption}</span>}
+  </figcaption>
+</figure>
+
+<style>
+  .arch { margin: 2rem 0 0; max-width: 52rem; }
+  .zone {
+    border: 1.5px dashed var(--muted);
+    padding: 0.875rem 1rem 1rem;
+    background: var(--paper);
+  }
+  .zt { margin: 0 0 0.75rem; font-family: var(--font-head); font-weight: 600; font-size: 0.9375rem; }
+  .nodes {
+    list-style: none; margin: 0; padding: 0;
+    display: grid; gap: 0.75rem;
+    grid-template-columns: repeat(var(--c), minmax(0, 1fr));
+  }
+  .n {
+    grid-column: span var(--s, 1);
+    border: 2px solid var(--ink);
+    background: var(--paper);
+    padding: 0.6rem 0.7rem;
+    display: flex; flex-direction: column; gap: 0.15rem;
+    position: relative;
+  }
+  .n strong { font-family: var(--font-head); font-weight: 600; font-size: 0.9375rem; line-height: 1.25; }
+  .n span { font-size: 0.8125rem; line-height: 1.35; color: var(--muted); }
+  .n.ext { border: 1px solid var(--border); background: var(--surface); }
+  .n.solo { border-color: var(--ink); }
+
+  .seq .n:not(:last-child)::after {
+    content: '';
+    position: absolute; top: 50%; right: calc(-0.75rem + 1px);
+    width: calc(0.75rem - 2px); height: 2px; background: var(--red);
+  }
+
+  .to { height: 1.75rem; position: relative; }
+  .to::before {
+    content: ''; position: absolute; left: 50%; top: 0.2rem; bottom: 0.45rem;
+    width: 2px; margin-left: -1px; background: var(--red);
+  }
+  .to::after {
+    content: ''; position: absolute; left: 50%; bottom: 0.15rem; margin-left: -5px;
+    border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 7px solid var(--red);
+  }
+  .gap { height: 0.75rem; }
+
+  figcaption {
+    margin-top: 1rem; display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem;
+    font-size: 0.8125rem; color: var(--muted); align-items: center;
+  }
+  .key { display: inline-flex; align-items: center; gap: 0.45rem; }
+  .k { display: inline-block; width: 1.1rem; height: 0.8rem; }
+  .k.own { border: 2px solid var(--ink); background: var(--paper); }
+  .k.ext { border: 1px solid var(--border); background: var(--surface); }
+  .k.bnd { border: 1.5px dashed var(--muted); }
+  .cap { flex-basis: 100%; }
+
+  @media (max-width: 40rem) {
+    .nodes { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .n { grid-column: span 1; }
+    .nodes.seq, .nodes.c3 { grid-template-columns: 1fr; }
+    .seq .n:not(:last-child)::after {
+      top: auto; bottom: calc(-0.75rem + 1px); right: auto; left: 50%;
+      width: 2px; height: calc(0.75rem - 2px);
+    }
+    .zone { padding: 0.75rem; }
+  }
+</style>
