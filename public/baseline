@@ -1,0 +1,1724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Baseline — Preventive Health Dashboard (Concept Prototype)</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;1,9..144,300;1,9..144,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --forest: #1B4D3E;
+  --forest-mid: #2D7A5F;
+  --fern: #3A9B74;
+  --sage: #6BAE8A;
+  --sage-light: #C8E6D5;
+  --mint: #EAF5EE;
+  --gold: #C8923A;
+  --gold-light: #F5E8D5;
+  --ink: #1A1F2E;
+  --mid: #4A5E5C;
+  --muted: #7A8F8C;
+  --soft: #A8BFBA;
+  --border: #DCE9E5;
+  --bg: #F4F1EC;
+  --surface: #FFFFFF;
+  --surface2: #F0EDE8;
+  --red: #C0392B;
+  --amber: #D08A00;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  min-height: 100vh;
+  font-size: 13px;
+}
+
+/* ── LAYOUT ── */
+.app { display: grid; grid-template-columns: 220px 1fr; min-height: 100vh; }
+
+/* ── SIDEBAR ── */
+.sidebar {
+  background: var(--forest);
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.sidebar-logo {
+  padding: 24px 20px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.sidebar-logo .brand {
+  font-family: 'Fraunces', serif;
+  font-size: 18px;
+  font-weight: 300;
+  color: #fff;
+  line-height: 1;
+  margin-bottom: 2px;
+}
+.sidebar-logo .brand-sub {
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--sage);
+}
+
+.sidebar-patient {
+  padding: 16px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.patient-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--fern);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  flex-shrink: 0;
+}
+.patient-name { font-size: 13px; font-weight: 500; color: #fff; line-height: 1.2; }
+.patient-id { font-size: 10px; color: rgba(255,255,255,0.4); margin-top: 2px; }
+
+.nav-section { padding: 16px 0 8px; }
+.nav-label {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.3);
+  padding: 0 20px;
+  margin-bottom: 4px;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 20px;
+  cursor: pointer;
+  transition: background 0.15s;
+  border-left: 3px solid transparent;
+}
+.nav-item:hover { background: rgba(255,255,255,0.06); }
+.nav-item.active {
+  background: rgba(107,174,138,0.15);
+  border-left-color: var(--sage);
+}
+.nav-icon {
+  width: 16px;
+  height: 16px;
+  opacity: 0.6;
+  flex-shrink: 0;
+}
+.nav-item.active .nav-icon { opacity: 1; }
+.nav-text {
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.6);
+}
+.nav-item.active .nav-text { color: #fff; }
+.nav-badge {
+  margin-left: auto;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 10px;
+  background: var(--sage);
+  color: var(--forest);
+}
+
+.sidebar-bottom {
+  margin-top: auto;
+  padding: 16px 20px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+.sidebar-bottom-text { font-size: 11px; color: rgba(255,255,255,0.35); line-height: 1.5; }
+.sidebar-bottom-text strong { color: rgba(255,255,255,0.6); font-weight: 500; }
+
+/* ── MAIN ── */
+.main { overflow-y: auto; }
+
+.topbar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.topbar-title { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 300; color: var(--forest); }
+.topbar-title em { font-style: italic; color: var(--fern); }
+.topbar-actions { display: flex; align-items: center; gap: 10px; }
+.btn-primary {
+  background: var(--forest);
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+}
+.btn-secondary {
+  background: none;
+  border: 1px solid var(--border);
+  padding: 7px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  color: var(--mid);
+  font-family: 'DM Sans', sans-serif;
+}
+.last-updated { font-size: 11px; color: var(--muted); }
+
+.content { padding: 24px 28px 48px; }
+
+/* ── HEALTH SCORE HERO ── */
+.hero-row {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.score-card {
+  background: var(--forest);
+  border-radius: 16px;
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+}
+.score-card::before {
+  content: '';
+  position: absolute;
+  top: -40px; right: -40px;
+  width: 160px; height: 160px;
+  border-radius: 50%;
+  background: rgba(107,174,138,0.15);
+}
+.score-label { font-size: 10px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: var(--sage); margin-bottom: 8px; }
+.score-number { font-family: 'Fraunces', serif; font-size: 72px; font-weight: 300; color: #fff; line-height: 1; margin-bottom: 4px; }
+.score-max { font-size: 18px; color: rgba(255,255,255,0.35); }
+.score-desc { font-size: 12px; color: rgba(255,255,255,0.6); line-height: 1.6; margin-bottom: 16px; }
+.score-trend {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--sage);
+  font-weight: 500;
+}
+.trend-up { color: var(--sage); }
+.trend-down { color: #F08080; }
+
+.alerts-card {
+  background: var(--surface);
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.alerts-header {
+  font-family: 'Fraunces', serif;
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--forest);
+  margin-bottom: 14px;
+}
+.alert-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+.alert-item:last-child { border-bottom: none; padding-bottom: 0; }
+.alert-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+.alert-dot.red { background: var(--red); }
+.alert-dot.amber { background: var(--amber); }
+.alert-dot.green { background: var(--fern); }
+.alert-body {}
+.alert-title { font-size: 13px; font-weight: 500; color: var(--ink); margin-bottom: 2px; }
+.alert-detail { font-size: 11px; color: var(--muted); line-height: 1.5; }
+.alert-action {
+  margin-left: auto;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--forest-mid);
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  padding-left: 8px;
+}
+
+/* ── SECTION LABELS ── */
+.section-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  margin-top: 24px;
+}
+.section-title {
+  font-family: 'Fraunces', serif;
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--forest);
+}
+.section-link { font-size: 12px; color: var(--forest-mid); font-weight: 500; cursor: pointer; }
+
+/* ── BIOMARKER GRID ── */
+.marker-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.marker-card {
+  background: var(--surface);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  padding: 14px 16px;
+  transition: box-shadow 0.15s;
+}
+.marker-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.06); }
+.marker-card.flag-red { border-color: #F5C6C6; background: #FEF8F8; }
+.marker-card.flag-amber { border-color: #F5DCB0; background: #FEFAF3; }
+.marker-card.flag-green { border-color: var(--sage-light); }
+
+.marker-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+.marker-name { font-size: 11px; font-weight: 600; color: var(--muted); letter-spacing: 0.04em; text-transform: uppercase; }
+.marker-status {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+.marker-status.optimal { background: var(--mint); color: var(--forest-mid); }
+.marker-status.watch { background: #FEF3DC; color: #8A5800; }
+.marker-status.high { background: #FEF0F0; color: var(--red); }
+
+.marker-value {
+  font-family: 'Fraunces', serif;
+  font-size: 26px;
+  font-weight: 400;
+  line-height: 1;
+  margin-bottom: 2px;
+}
+.marker-value.red { color: var(--red); }
+.marker-value.amber { color: var(--amber); }
+.marker-value.green { color: var(--forest-mid); }
+
+.marker-unit { font-size: 11px; color: var(--muted); margin-bottom: 10px; }
+.marker-range { font-size: 10px; color: var(--soft); margin-bottom: 8px; }
+
+/* Mini sparkline */
+.sparkline { display: flex; align-items: flex-end; gap: 2px; height: 24px; }
+.spark-bar {
+  flex: 1;
+  border-radius: 2px 2px 0 0;
+  min-height: 3px;
+}
+.spark-bar.green { background: var(--sage-light); }
+.spark-bar.amber { background: #F5DCB0; }
+.spark-bar.red { background: #F5C6C6; }
+.spark-bar.active-green { background: var(--fern); }
+.spark-bar.active-amber { background: var(--amber); }
+.spark-bar.active-red { background: var(--red); }
+
+/* ── BODY COMPOSITION ── */
+.body-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.body-card {
+  background: var(--surface);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  padding: 16px;
+}
+.body-label { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+.body-value { font-family: 'Fraunces', serif; font-size: 32px; font-weight: 300; color: var(--ink); line-height: 1; margin-bottom: 2px; }
+.body-unit { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+.body-bar-bg { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; margin-bottom: 6px; }
+.body-bar-fill { height: 100%; border-radius: 3px; }
+.body-context { font-size: 11px; color: var(--muted); line-height: 1.5; }
+
+/* ── TWO COLUMN ROW ── */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 4px; }
+.three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+
+/* ── CONDITIONS / HISTORY ── */
+.list-card {
+  background: var(--surface);
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+.list-card-header {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.list-card-title { font-family: 'Fraunces', serif; font-size: 15px; font-weight: 400; color: var(--forest); }
+.list-card-action { font-size: 11px; color: var(--forest-mid); font-weight: 500; cursor: pointer; }
+.list-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 18px;
+  border-bottom: 1px solid var(--border);
+}
+.list-row:last-child { border-bottom: none; }
+.list-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.list-icon.green { background: var(--mint); }
+.list-icon.amber { background: #FEF3DC; }
+.list-icon.slate { background: var(--surface2); }
+.list-main { flex: 1; }
+.list-title { font-size: 13px; font-weight: 500; color: var(--ink); margin-bottom: 2px; }
+.list-sub { font-size: 11px; color: var(--muted); }
+.list-right { text-align: right; }
+.list-date { font-size: 11px; color: var(--muted); }
+.list-tag {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.list-tag.managed { background: var(--mint); color: var(--forest-mid); }
+.list-tag.watch { background: #FEF3DC; color: #8A5800; }
+.list-tag.resolved { background: var(--surface2); color: var(--muted); }
+
+/* ── APPOINTMENTS ── */
+.appt-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--border);
+}
+.appt-row:last-child { border-bottom: none; }
+.appt-date-block {
+  text-align: center;
+  width: 42px;
+  flex-shrink: 0;
+}
+.appt-day { font-family: 'Fraunces', serif; font-size: 22px; font-weight: 300; color: var(--forest); line-height: 1; }
+.appt-month { font-size: 9px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.appt-divider { width: 1px; height: 36px; background: var(--border); flex-shrink: 0; }
+.appt-main { flex: 1; }
+.appt-title { font-size: 13px; font-weight: 500; color: var(--ink); margin-bottom: 2px; }
+.appt-with { font-size: 11px; color: var(--muted); }
+.appt-type {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: var(--mint);
+  color: var(--forest-mid);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.appt-type.past { background: var(--surface2); color: var(--muted); }
+
+/* ── RISK PANEL ── */
+.risk-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.risk-card {
+  background: var(--surface);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  padding: 16px;
+}
+.risk-card.elevated { border-color: #F5DCB0; background: #FEFAF3; }
+.risk-label { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+.risk-level {
+  font-family: 'Fraunces', serif;
+  font-size: 20px;
+  font-weight: 400;
+  margin-bottom: 4px;
+}
+.risk-level.low { color: var(--forest-mid); }
+.risk-level.moderate { color: var(--amber); }
+.risk-level.elevated { color: var(--red); }
+.risk-detail { font-size: 11px; color: var(--muted); line-height: 1.6; margin-bottom: 10px; }
+.risk-bar-bg { height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; }
+.risk-bar-fill { height: 100%; border-radius: 3px; }
+
+/* ── REFERRALS ── */
+.ref-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--border);
+}
+.ref-row:last-child { border-bottom: none; }
+.ref-circle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--mint);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--forest);
+  flex-shrink: 0;
+}
+.ref-main { flex: 1; }
+.ref-title { font-size: 13px; font-weight: 500; color: var(--ink); margin-bottom: 2px; }
+.ref-detail { font-size: 11px; color: var(--muted); }
+.ref-status {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.ref-status.active { background: #FEF3DC; color: #8A5800; }
+.ref-status.complete { background: var(--mint); color: var(--forest-mid); }
+
+/* ── WEARABLE STRIP ── */
+.wearable-strip {
+  background: var(--surface);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 4px;
+}
+.wearable-item {
+  flex: 1;
+  text-align: center;
+  padding: 0 16px;
+  border-right: 1px solid var(--border);
+}
+.wearable-item:last-child { border-right: none; }
+.wearable-icon { font-size: 18px; margin-bottom: 4px; }
+.wearable-val { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 300; color: var(--forest); line-height: 1; margin-bottom: 2px; }
+.wearable-label { font-size: 10px; color: var(--muted); font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; }
+.wearable-sub { font-size: 10px; color: var(--soft); margin-top: 2px; }
+
+/* ── QUICK ACTIONS ── */
+.quick-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 4px; }
+.quick-card {
+  background: var(--surface);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  padding: 16px 14px;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: center;
+}
+.quick-card:hover { border-color: var(--sage); box-shadow: 0 4px 14px rgba(27,77,62,0.08); }
+.quick-card.primary { background: var(--forest); border-color: var(--forest); }
+.quick-icon { font-size: 22px; margin-bottom: 8px; }
+.quick-label { font-size: 12px; font-weight: 600; color: var(--ink); }
+.quick-card.primary .quick-label { color: #fff; }
+.quick-sub { font-size: 10px; color: var(--muted); margin-top: 2px; }
+.quick-card.primary .quick-sub { color: rgba(255,255,255,0.6); }
+
+/* ── CHART AREA ── */
+.chart-card {
+  background: var(--surface);
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  padding: 18px;
+}
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.chart-title { font-family: 'Fraunces', serif; font-size: 15px; font-weight: 400; color: var(--forest); }
+.chart-legend { display: flex; gap: 14px; }
+.legend-item { display: flex; align-items: center; gap: 5px; font-size: 10px; color: var(--muted); font-weight: 500; }
+.legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+.chart-area { height: 120px; position: relative; display: flex; align-items: flex-end; gap: 0; padding: 0 4px; }
+.chart-line-wrapper { position: absolute; inset: 0; padding: 0 4px; }
+
+/* Simple bar chart for blood work trend */
+.bar-group { flex: 1; display: flex; align-items: flex-end; gap: 3px; padding: 0 3px; }
+.bar-item { flex: 1; border-radius: 3px 3px 0 0; transition: opacity 0.2s; }
+.bar-item:hover { opacity: 0.8; }
+
+.chart-labels { display: flex; margin-top: 6px; padding: 0 4px; }
+.chart-label { flex: 1; text-align: center; font-size: 10px; color: var(--muted); }
+
+/* Tabs */
+.tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 16px; }
+.tab-item {
+  font-size: 12px;
+  font-weight: 500;
+  padding: 9px 16px;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  color: var(--muted);
+  margin-bottom: -1px;
+}
+.tab-item.active { color: var(--forest); border-bottom-color: var(--forest); }
+
+/* ── MOBILE HEADER & OVERLAY ── */
+.mobile-header {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 52px;
+  background: var(--forest);
+  z-index: 300;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+}
+.mobile-brand { font-family: 'Fraunces', serif; font-size: 17px; color: #fff; font-weight: 300; }
+.mobile-brand em { color: var(--sage); font-style: normal; }
+.hamburger {
+  width: 36px; height: 36px;
+  display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 5px;
+  cursor: pointer; border-radius: 8px; background: rgba(255,255,255,0.1); border: none;
+}
+.hamburger span { display: block; width: 18px; height: 2px; background: #fff; border-radius: 2px; transition: all 0.25s; }
+.sidebar-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.45); z-index: 298;
+}
+.sidebar-overlay.visible { display: block; }
+
+@media (max-width: 768px) {
+  .mobile-header { display: flex; }
+  body { padding-top: 52px; }
+  .app { display: block; }
+  .sidebar {
+    position: fixed;
+    top: 52px; left: 0; bottom: 0;
+    width: 260px;
+    transform: translateX(-100%);
+    transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 299;
+    overflow-y: auto;
+  }
+  .sidebar.open { transform: translateX(0); }
+  .main { width: 100%; }
+  .topbar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 16px 16px 12px;
+  }
+  .topbar-actions { width: 100%; }
+  .topbar-actions .btn-secondary,
+  .topbar-actions .btn-primary { flex: 1; text-align: center; }
+  .content { padding: 16px 16px 48px; }
+  .hero-row { grid-template-columns: 1fr; }
+  .quick-grid { grid-template-columns: repeat(2, 1fr); }
+  .two-col { grid-template-columns: 1fr; }
+  .three-col { grid-template-columns: 1fr; }
+  .risk-grid { grid-template-columns: 1fr; }
+  .biomarker-grid { grid-template-columns: 1fr; }
+  .biomarker-card { display: flex; align-items: center; gap: 12px; padding: 12px 14px; }
+  .bm-header { flex-direction: column; align-items: flex-start; margin-bottom: 0; min-width: 120px; }
+  .bm-value { font-size: 20px; min-width: 80px; }
+  .sparkline { display: none; }
+  .bm-range, .bm-trend { display: none; }
+  .tabs { overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; flex-wrap: nowrap; padding-bottom: 2px; }
+  .tab-item { flex-shrink: 0; }
+  .section-title { font-size: 14px; }
+  .score-card { padding: 20px; }
+  .ref-row { flex-wrap: wrap; gap: 8px; }
+  .chart-area { height: 80px; }
+  .topbar-title { font-size: 17px; }
+}
+@media (max-width: 400px) {
+  .quick-grid { grid-template-columns: 1fr 1fr; }
+}
+</style>
+
+<style>
+.proto-bar{position:fixed;left:0;right:0;bottom:0;z-index:9999;background:#1B4D3E;color:#F4F1EC;font:13px/1.4 'DM Sans',sans-serif;padding:9px 16px;display:flex;gap:12px;align-items:center;justify-content:center;flex-wrap:wrap}
+.proto-bar a,.proto-bar button{color:#F4F1EC;background:none;border:0;border-bottom:1px solid rgba(244,241,236,.6);font:inherit;cursor:pointer;padding:0;text-decoration:none}
+.proto-tour{position:fixed;left:50%;transform:translateX(-50%);bottom:56px;z-index:10000;background:#fff;color:#1A1F2E;border:1px solid #DCE9E5;border-radius:12px;box-shadow:0 8px 30px rgba(0,0,0,.18);padding:16px 18px;width:min(460px,calc(100vw - 32px));font:14px/1.5 'DM Sans',sans-serif;display:none}
+.proto-tour b{font-family:'Fraunces',serif;font-weight:600}
+.proto-tour .row{display:flex;gap:8px;justify-content:space-between;align-items:center;margin-top:12px}
+.proto-tour button{font:inherit;border-radius:8px;padding:7px 14px;border:1px solid #1B4D3E;background:#fff;color:#1B4D3E;cursor:pointer}
+.proto-tour button.p{background:#1B4D3E;color:#fff}
+.proto-welcome{position:fixed;inset:0;z-index:10001;background:rgba(26,31,46,.55);display:flex;align-items:center;justify-content:center;padding:16px}
+.proto-welcome .card{background:#F4F1EC;color:#1A1F2E;border-radius:14px;max-width:520px;padding:28px;font:15px/1.55 'DM Sans',sans-serif}
+.proto-welcome h2{font-family:'Fraunces',serif;font-weight:400;font-size:26px;margin:0 0 10px;color:#1B4D3E}
+.proto-welcome p{margin:0 0 10px}
+.proto-welcome .row{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+.proto-welcome button{font:inherit;border-radius:8px;padding:9px 16px;border:1px solid #1B4D3E;background:#fff;color:#1B4D3E;cursor:pointer}
+.proto-welcome button.p{background:#1B4D3E;color:#fff}
+body{padding-bottom:44px}.sidebar{padding-bottom:44px}
+</style>
+<style>.list-icon{display:flex;align-items:center;justify-content:center}.list-icon.amber{color:#8a5800}.list-icon.slate{color:#5A6B78}.list-icon.green{color:var(--forest)}</style></head>
+<body>
+<div class="proto-bar" role="note">
+  <span>Concept prototype &middot; synthetic data &middot; not medical advice</span>
+  <button type="button" id="proto-tour-btn">Guided tour</button>
+  <a href="/#projects">About this project</a>
+</div>
+<div class="proto-tour" id="proto-tour" role="dialog" aria-live="polite">
+  <div id="proto-tour-text"></div>
+  <div class="row"><button type="button" id="pt-exit">Exit</button><span id="pt-count" style="font-size:12px;color:#7A8F8C"></span><span><button type="button" id="pt-back">Back</button> <button type="button" class="p" id="pt-next">Next</button></span></div>
+</div>
+<div class="proto-welcome" id="proto-welcome">
+  <div class="card">
+    <h2>Baseline: a preventive health dashboard concept</h2>
+    <p>An interactive prototype of a patient-facing dashboard that brings lab results, wearable data, risks and care history together in a plain-language picture of where you stand and what to do next.</p>
+    <p>Everything here is synthetic demo data. It is a design and product exercise, not a live service and not medical advice.</p>
+    <div class="row"><button type="button" class="p" id="pw-tour">Take the 2-minute tour</button><button type="button" id="pw-explore">Explore on my own</button></div>
+  </div>
+</div>
+
+<div class="mobile-header">
+  <div class="mobile-brand">Baseline <em>Concept</em></div>
+  <button class="hamburger" id="hamburger" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</div>
+<div class="sidebar-overlay" id="overlay"></div>
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <div class="brand">Baseline</div>
+      <div class="brand-sub">Concept</div>
+    </div>
+
+    <div class="sidebar-patient">
+      <div class="patient-avatar">AM</div>
+      <div>
+        <div class="patient-name">Alex Morgan</div>
+        <div class="patient-id">Demo patient · Age 43</div>
+      </div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Overview</div>
+      <div class="nav-item active">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1.5" fill="white"/><rect x="9" y="1" width="6" height="6" rx="1.5" fill="white" opacity=".5"/><rect x="1" y="9" width="6" height="6" rx="1.5" fill="white" opacity=".5"/><rect x="9" y="9" width="6" height="6" rx="1.5" fill="white" opacity=".5"/></svg>
+        <span class="nav-text">Dashboard</span>
+      </div>
+      <div class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M8 2L9.5 6h4l-3.2 2.3 1.2 3.7L8 10l-3.5 2 1.2-3.7L2.5 6h4z" fill="white" opacity=".6"/></svg>
+        <span class="nav-text">Health Score</span>
+      </div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">My Health</div>
+      <div class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M3 8h2l2-4 2 8 2-4 1 0" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity=".6"/></svg>
+        <span class="nav-text">Biomarkers</span>
+        <span class="nav-badge">2</span>
+      </div>
+      <div class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.5" stroke="white" stroke-width="1.4" opacity=".6"/><path d="M8 5v3l2 1.5" stroke="white" stroke-width="1.4" stroke-linecap="round" opacity=".6"/></svg>
+        <span class="nav-text">Body Composition</span>
+      </div>
+      <div class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M2 10l4-6 3 4 2-3 3 5" stroke="white" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" opacity=".6"/></svg>
+        <span class="nav-text">Risk Trends</span>
+      </div>
+      <div class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M4 3h8a1 1 0 011 1v8a1 1 0 01-1 1H4a1 1 0 01-1-1V4a1 1 0 011-1z" stroke="white" stroke-width="1.4" opacity=".6"/><path d="M6 7h4M6 10h2" stroke="white" stroke-width="1.2" stroke-linecap="round" opacity=".6"/></svg>
+        <span class="nav-text">Conditions</span>
+      </div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Care</div>
+      <div class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="1.5" stroke="white" stroke-width="1.4" opacity=".6"/><path d="M5 3V2M11 3V2M2 7h12" stroke="white" stroke-width="1.3" stroke-linecap="round" opacity=".6"/></svg>
+        <span class="nav-text">Appointments</span>
+        <span class="nav-badge">1</span>
+      </div>
+      <div class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M3 4h10M3 8h7M3 12h5" stroke="white" stroke-width="1.4" stroke-linecap="round" opacity=".6"/></svg>
+        <span class="nav-text">Referrals</span>
+      </div>
+      <div class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="6" r="3" stroke="white" stroke-width="1.4" opacity=".6"/><path d="M2 14c0-2.2 2.7-4 6-4s6 1.8 6 4" stroke="white" stroke-width="1.4" stroke-linecap="round" opacity=".6"/></svg>
+        <span class="nav-text">My Care Team</span>
+      </div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Actions</div>
+      <div class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="6" stroke="white" stroke-width="1.4" opacity=".6"/><path d="M8 5v3M8 10v.5" stroke="white" stroke-width="1.5" stroke-linecap="round" opacity=".6"/></svg>
+        <span class="nav-text">Suggested Tests</span>
+      </div>
+      <div class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M2 12l4-4 3 3 5-6" stroke="white" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" opacity=".6"/></svg>
+        <span class="nav-text">Messages</span>
+      </div>
+    </div>
+
+    <div class="sidebar-bottom">
+      <div class="sidebar-bottom-text">
+        <strong>Next appointment</strong><br>
+        May 3, 2026 · Follow-up: ApoB review<br>
+        Dr. Demo Physician
+      </div>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <div class="topbar-title">Good morning, <em>Alex</em></div>
+        <div class="last-updated" style="font-size:11px; color:var(--muted); margin-top:2px;">Last updated Apr 10, 2026 · Annual health exam</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn-secondary">Suggested Tests</button>
+        <button class="btn-primary">Book Appointment</button>
+      </div>
+    </div>
+
+    <div class="content" id="view-dashboard">
+
+      <!-- QUICK ACTIONS -->
+      <div class="quick-grid">
+        <div class="quick-card primary">
+          <div class="quick-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg></div>
+          <div class="quick-label">Book Appointment</div>
+          <div class="quick-sub">Next available: May 1</div>
+        </div>
+        <div class="quick-card">
+          <div class="quick-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-9V3"/></svg></div>
+          <div class="quick-label">Suggested Bloodwork</div>
+          <div class="quick-sub">Sent to your physician to review</div>
+        </div>
+        <div class="quick-card">
+          <div class="quick-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4h6v3H9zM9 12h6M9 16h4"/></svg></div>
+          <div class="quick-label">Screening Recommendation</div>
+          <div class="quick-sub">Colorectal screening due at 45</div>
+        </div>
+        <div class="quick-card">
+          <div class="quick-icon"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"/></svg></div>
+          <div class="quick-label">Message Care Team</div>
+          <div class="quick-sub">Response within 24h</div>
+        </div>
+      </div>
+
+      <!-- HERO ROW: HEALTH SCORE + ALERTS -->
+      <div class="section-row">
+        <div class="section-title">Your health at a glance</div>
+      </div>
+
+      <div class="hero-row">
+        <div class="score-card">
+          <div class="score-label">Baseline Health Score</div>
+          <div style="display:flex; align-items:baseline; gap:4px; margin-bottom:6px;">
+            <div class="score-number">74</div>
+            <div class="score-max">/ 100</div>
+          </div>
+          <div class="score-desc">Your score is based on biomarkers, body composition, fitness, and lifestyle factors. Scores above 80 reflect low preventable disease risk.</div>
+          <div class="score-trend trend-up">↑ +6 points since last year</div>
+          <div style="margin-top:16px; display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+            <div style="background:rgba(255,255,255,0.08); border-radius:8px; padding:10px 12px;">
+              <div style="font-size:10px; color:rgba(255,255,255,0.4); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:2px;">Age</div>
+              <div style="font-family:'Fraunces',serif; font-size:18px; color:#fff; font-weight:300;">43</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.08); border-radius:8px; padding:10px 12px;">
+              <div style="font-size:10px; color:rgba(255,255,255,0.4); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:2px;">Bio Age</div>
+              <div style="font-family:'Fraunces',serif; font-size:18px; color:var(--sage); font-weight:300;">39 <span style="font-size:12px; color:rgba(255,255,255,0.4);">est.</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="alerts-card">
+          <div class="alerts-header">What needs your attention</div>
+
+          <div class="alert-item">
+            <div class="alert-dot red"></div>
+            <div class="alert-body">
+              <div class="alert-title">ApoB elevated — 1.32 g/L</div>
+              <div class="alert-detail">Above optimal range. Cardiovascular risk factor. Review with your physician at your May appointment.</div>
+            </div>
+            <div class="alert-action">View →</div>
+          </div>
+
+          <div class="alert-item">
+            <div class="alert-dot amber"></div>
+            <div class="alert-body">
+              <div class="alert-title">Colorectal screening coming up</div>
+              <div class="alert-detail">Recommended from age 45. You are 43, so this is worth discussing at your next visit.</div>
+            </div>
+            <div class="alert-action">Book →</div>
+          </div>
+
+          <div class="alert-item">
+            <div class="alert-dot amber"></div>
+            <div class="alert-body">
+              <div class="alert-title">Fasting glucose trending up</div>
+              <div class="alert-detail">5.4 → 5.7 → 5.9 mmol/L over 3 years. Still normal, but approaching pre-diabetic range.</div>
+            </div>
+            <div class="alert-action">View →</div>
+          </div>
+
+          <div class="alert-item">
+            <div class="alert-dot green"></div>
+            <div class="alert-body">
+              <div class="alert-title">Annual health exam complete</div>
+              <div class="alert-detail">Apr 10, 2026 · Full panel results now available.</div>
+            </div>
+            <div class="alert-action">View →</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- WEARABLE STRIP -->
+      <div class="wearable-strip">
+        <div class="wearable-item">
+          <div class="wearable-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"/></svg></div>
+          <div class="wearable-val">62</div>
+          <div class="wearable-label">Resting HR</div>
+          <div class="wearable-sub">bpm · 7-day avg</div>
+        </div>
+        <div class="wearable-item">
+          <div class="wearable-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="14" cy="5" r="2"/><path d="M8 21l3-6 3 2 2-6M6 11l4-3 4 1 3 3"/></svg></div>
+          <div class="wearable-val">8,240</div>
+          <div class="wearable-label">Steps</div>
+          <div class="wearable-sub">Today</div>
+        </div>
+        <div class="wearable-item">
+          <div class="wearable-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 14A8 8 0 1 1 10 4a6 6 0 0 0 10 10z"/></svg></div>
+          <div class="wearable-val">6h 48m</div>
+          <div class="wearable-label">Sleep</div>
+          <div class="wearable-sub">Last night</div>
+        </div>
+        <div class="wearable-item">
+          <div class="wearable-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v8M12 12c-2 0-6 1-6 6 0 1.5 1 2 2 2 2 0 4-2 4-5M12 12c2 0 6 1 6 6 0 1.5-1 2-2 2-2 0-4-2-4-5"/></svg></div>
+          <div class="wearable-val">96%</div>
+          <div class="wearable-label">Blood O₂</div>
+          <div class="wearable-sub">SpO2 · resting</div>
+        </div>
+        <div class="wearable-item">
+          <div class="wearable-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M13 3L5 14h6l-1 7 8-11h-6z"/></svg></div>
+          <div class="wearable-val">42</div>
+          <div class="wearable-label">HRV</div>
+          <div class="wearable-sub">ms · 7-day avg</div>
+        </div>
+        <div style="padding: 0 16px; display:flex; align-items:center; gap:6px; border-left:1px solid var(--border);">
+          <div style="width:8px; height:8px; border-radius:50%; background:var(--fern);"></div>
+          <div style="font-size:11px; color:var(--muted);">Wearable · Synced 2h ago (simulated)</div>
+        </div>
+      </div>
+
+<div class="section-row"><div class="section-title">Daily metrics</div><div class="section-link">Last 30 days</div></div><div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-bottom:12px;"><div style="background:var(--surface);border-radius:12px;padding:16px;"><div style="font-size:12px;font-weight:600;">Resting heart rate</div><div style="font-family:Fraunces,serif;font-size:26px;font-weight:300;margin-top:4px;">62 <span style="font-family:DM Sans,sans-serif;font-size:12px;color:var(--muted);">bpm</span></div><div style="font-size:11px;color:var(--forest-mid);font-weight:500;margin:2px 0 6px;">↓ 3 bpm over 90 days</div><svg viewBox="0 0 220 44" width="100%" height="44" preserveAspectRatio="none" aria-hidden="true"><polyline points="0.0,4.0 7.6,4.0 15.2,13.0 22.8,4.0 30.3,13.0 37.9,13.0 45.5,22.0 53.1,13.0 60.7,22.0 68.3,22.0 75.9,13.0 83.4,22.0 91.0,22.0 98.6,31.0 106.2,22.0 113.8,31.0 121.4,22.0 129.0,31.0 136.6,31.0 144.1,22.0 151.7,31.0 159.3,31.0 166.9,40.0 174.5,31.0 182.1,31.0 189.7,22.0 197.2,31.0 204.8,31.0 212.4,31.0 220.0,31.0" fill="none" stroke="#2D7A5F" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg><div style="font-size:11px;color:var(--muted);margin-top:6px;">Lower resting rate fits improving fitness and supports your cardiovascular picture.</div></div><div style="background:var(--surface);border-radius:12px;padding:16px;"><div style="font-size:12px;font-weight:600;">Sleep</div><div style="font-family:Fraunces,serif;font-size:26px;font-weight:300;margin-top:4px;">7.0 <span style="font-family:DM Sans,sans-serif;font-size:12px;color:var(--muted);">h avg</span></div><div style="font-size:11px;color:var(--forest-mid);font-weight:500;margin:2px 0 6px;">Under 7 h on 16 of 30 nights</div><svg viewBox="0 0 220 44" width="100%" height="44" preserveAspectRatio="none" aria-hidden="true"><polyline points="0.0,31.0 7.6,24.2 15.2,17.5 22.8,35.5 30.3,26.5 37.9,10.7 45.5,4.0 53.1,33.2 60.7,28.8 68.3,19.8 75.9,37.8 83.4,24.2 91.0,13.0 98.6,6.2 106.2,31.0 113.8,26.5 121.4,22.0 129.0,40.0 136.6,24.2 144.1,15.3 151.7,8.5 159.3,28.8 166.9,24.2 174.5,19.8 182.1,35.5 189.7,22.0 197.2,13.0 204.8,4.0 212.4,22.0 220.0,26.5" fill="none" stroke="#2D7A5F" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg><div style="font-size:11px;color:var(--muted);margin-top:6px;">Short sleep can raise blood pressure and glucose. Worth watching alongside your fasting glucose trend.</div></div><div style="background:var(--surface);border-radius:12px;padding:16px;"><div style="font-size:12px;font-weight:600;">Heart rate variability</div><div style="font-family:Fraunces,serif;font-size:26px;font-weight:300;margin-top:4px;">42 <span style="font-family:DM Sans,sans-serif;font-size:12px;color:var(--muted);">ms</span></div><div style="font-size:11px;color:var(--forest-mid);font-weight:500;margin:2px 0 6px;">↑ 4 ms over 90 days</div><svg viewBox="0 0 220 44" width="100%" height="44" preserveAspectRatio="none" aria-hidden="true"><polyline points="0.0,40.0 7.6,32.8 15.2,40.0 22.8,25.6 30.3,32.8 37.9,25.6 45.5,18.4 53.1,25.6 60.7,32.8 68.3,18.4 75.9,25.6 83.4,18.4 91.0,11.2 98.6,18.4 106.2,25.6 113.8,18.4 121.4,11.2 129.0,18.4 136.6,11.2 144.1,4.0 151.7,18.4 159.3,11.2 166.9,18.4 174.5,11.2 182.1,4.0 189.7,11.2 197.2,18.4 204.8,11.2 212.4,11.2 220.0,11.2" fill="none" stroke="#2D7A5F" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg><div style="font-size:11px;color:var(--muted);margin-top:6px;">Higher is generally better recovery. Trend matters more than any single reading.</div></div></div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px;font-size:12px;"><span style="background:var(--mint);color:var(--forest);border-radius:10px;padding:3px 10px;">Wearable: connected (simulated)</span><span style="background:var(--mint);color:var(--forest);border-radius:10px;padding:3px 10px;">Clinic EMR: connected (simulated)</span><span style="background:#fff;border:1px solid var(--border);color:var(--muted);border-radius:10px;padding:3px 10px;">Lab results: imported from EMR</span></div>
+      <!-- BIOMARKERS -->
+      <div class="section-row">
+        <div class="section-title">Key biomarkers</div>
+        <div class="section-link">View all results →</div>
+      </div>
+
+      <div class="marker-grid">
+        <div class="marker-card flag-red">
+          <div class="marker-top">
+            <div class="marker-name">ApoB</div>
+            <div class="marker-status high">High</div>
+          </div>
+          <div class="marker-value red">1.32</div>
+          <div class="marker-unit">g/L · optimal &lt;0.90</div>
+          <div class="sparkline">
+            <div class="spark-bar green" style="height:30%"></div>
+            <div class="spark-bar green" style="height:45%"></div>
+            <div class="spark-bar amber" style="height:65%"></div>
+            <div class="spark-bar amber" style="height:80%"></div>
+            <div class="spark-bar active-red" style="height:100%"></div>
+          </div>
+          <div class="marker-range" style="margin-top:4px; font-size:10px; color:var(--red);">↑ Rising trend over 2 years</div>
+        </div>
+
+        <div class="marker-card flag-amber">
+          <div class="marker-top">
+            <div class="marker-name">Fasting Glucose</div>
+            <div class="marker-status watch">Watch</div>
+          </div>
+          <div class="marker-value amber">5.9</div>
+          <div class="marker-unit">mmol/L · optimal &lt;5.6</div>
+          <div class="sparkline">
+            <div class="spark-bar green" style="height:40%"></div>
+            <div class="spark-bar green" style="height:50%"></div>
+            <div class="spark-bar green" style="height:60%"></div>
+            <div class="spark-bar amber" style="height:75%"></div>
+            <div class="spark-bar active-amber" style="height:90%"></div>
+          </div>
+          <div class="marker-range" style="margin-top:4px; font-size:10px; color:var(--amber);">↑ Pre-diabetic range approaching</div>
+        </div>
+
+        <div class="marker-card flag-green">
+          <div class="marker-top">
+            <div class="marker-name">HbA1c</div>
+            <div class="marker-status optimal">Optimal</div>
+          </div>
+          <div class="marker-value green">5.2</div>
+          <div class="marker-unit">% · optimal &lt;5.7</div>
+          <div class="sparkline">
+            <div class="spark-bar green" style="height:70%"></div>
+            <div class="spark-bar green" style="height:60%"></div>
+            <div class="spark-bar green" style="height:75%"></div>
+            <div class="spark-bar green" style="height:65%"></div>
+            <div class="spark-bar active-green" style="height:68%"></div>
+          </div>
+          <div class="marker-range" style="margin-top:4px;">Stable</div>
+        </div>
+
+        <div class="marker-card flag-green">
+          <div class="marker-top">
+            <div class="marker-name">Testosterone</div>
+            <div class="marker-status optimal">Optimal</div>
+          </div>
+          <div class="marker-value green">18.4</div>
+          <div class="marker-unit">nmol/L · range 10–35</div>
+          <div class="sparkline">
+            <div class="spark-bar green" style="height:65%"></div>
+            <div class="spark-bar green" style="height:70%"></div>
+            <div class="spark-bar green" style="height:62%"></div>
+            <div class="spark-bar green" style="height:68%"></div>
+            <div class="spark-bar active-green" style="height:72%"></div>
+          </div>
+          <div class="marker-range" style="margin-top:4px;">Stable · mid-range</div>
+        </div>
+
+        <div class="marker-card flag-green">
+          <div class="marker-top">
+            <div class="marker-name">hs-CRP</div>
+            <div class="marker-status optimal">Optimal</div>
+          </div>
+          <div class="marker-value green">0.8</div>
+          <div class="marker-unit">mg/L · optimal &lt;1.0</div>
+          <div class="sparkline">
+            <div class="spark-bar amber" style="height:80%"></div>
+            <div class="spark-bar green" style="height:60%"></div>
+            <div class="spark-bar green" style="height:50%"></div>
+            <div class="spark-bar green" style="height:45%"></div>
+            <div class="spark-bar active-green" style="height:40%"></div>
+          </div>
+          <div class="marker-range" style="margin-top:4px; color:var(--fern);">↓ Improving</div>
+        </div>
+
+        <div class="marker-card flag-green">
+          <div class="marker-top">
+            <div class="marker-name">Lp(a)</div>
+            <div class="marker-status optimal">Optimal</div>
+          </div>
+          <div class="marker-value green">28</div>
+          <div class="marker-unit">nmol/L · optimal &lt;75</div>
+          <div class="sparkline">
+            <div class="spark-bar green" style="height:35%"></div>
+            <div class="spark-bar green" style="height:38%"></div>
+            <div class="spark-bar green" style="height:32%"></div>
+            <div class="spark-bar green" style="height:36%"></div>
+            <div class="spark-bar active-green" style="height:34%"></div>
+          </div>
+          <div class="marker-range" style="margin-top:4px;">Genetically stable</div>
+        </div>
+
+        <div class="marker-card flag-green">
+          <div class="marker-top">
+            <div class="marker-name">Vitamin D</div>
+            <div class="marker-status optimal">Optimal</div>
+          </div>
+          <div class="marker-value green">88</div>
+          <div class="marker-unit">nmol/L · optimal 75–200</div>
+          <div class="sparkline">
+            <div class="spark-bar amber" style="height:30%"></div>
+            <div class="spark-bar amber" style="height:40%"></div>
+            <div class="spark-bar green" style="height:65%"></div>
+            <div class="spark-bar green" style="height:75%"></div>
+            <div class="spark-bar active-green" style="height:80%"></div>
+          </div>
+          <div class="marker-range" style="margin-top:4px; color:var(--fern);">↑ Improving with supplement</div>
+        </div>
+
+        <div class="marker-card flag-green">
+          <div class="marker-top">
+            <div class="marker-name">TSH</div>
+            <div class="marker-status optimal">Optimal</div>
+          </div>
+          <div class="marker-value green">1.8</div>
+          <div class="marker-unit">mIU/L · range 0.4–4.0</div>
+          <div class="sparkline">
+            <div class="spark-bar green" style="height:50%"></div>
+            <div class="spark-bar green" style="height:55%"></div>
+            <div class="spark-bar green" style="height:48%"></div>
+            <div class="spark-bar green" style="height:52%"></div>
+            <div class="spark-bar active-green" style="height:50%"></div>
+          </div>
+          <div class="marker-range" style="margin-top:4px;">Stable</div>
+        </div>
+      </div>
+
+      <!-- BODY COMPOSITION + RISK -->
+      <div class="two-col" style="margin-top:24px;">
+
+        <div>
+          <div class="section-row">
+            <div class="section-title">Body composition</div>
+            <div class="section-link">History →</div>
+          </div>
+          <div class="body-grid">
+            <div class="body-card">
+              <div class="body-label">Body Fat</div>
+              <div class="body-value">19.2</div>
+              <div class="body-unit">% · healthy range 12–22%</div>
+              <div class="body-bar-bg"><div class="body-bar-fill" style="width:62%; background:var(--fern);"></div></div>
+              <div class="body-context" style="color:var(--forest-mid);">Healthy range</div>
+            </div>
+            <div class="body-card">
+              <div class="body-label">VO₂ Max</div>
+              <div class="body-value">44</div>
+              <div class="body-unit">mL/kg/min · above avg for age</div>
+              <div class="body-bar-bg"><div class="body-bar-fill" style="width:72%; background:var(--fern);"></div></div>
+              <div class="body-context" style="color:var(--forest-mid);">Above average</div>
+            </div>
+            <div class="body-card">
+              <div class="body-label">Muscle Mass</div>
+              <div class="body-value">38.4</div>
+              <div class="body-unit">kg · skeletal muscle</div>
+              <div class="body-bar-bg"><div class="body-bar-fill" style="width:68%; background:var(--fern);"></div></div>
+              <div class="body-context">Normal</div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="section-row">
+            <div class="section-title">Disease risk trends</div>
+            <div class="section-link">Full report →</div>
+          </div>
+          <div class="risk-grid">
+            <div class="risk-card elevated">
+              <div class="risk-label">Cardiovascular</div>
+              <div class="risk-level moderate">Moderate</div>
+              <div class="risk-detail">ApoB elevated. 10-yr Framingham risk: 8.4%. Lifestyle + statin conversation at next visit.</div>
+              <div class="risk-bar-bg"><div class="risk-bar-fill" style="width:45%; background:var(--amber);"></div></div>
+            </div>
+            <div class="risk-card elevated">
+              <div class="risk-label">Type 2 Diabetes</div>
+              <div class="risk-level moderate">Watch</div>
+              <div class="risk-detail">Glucose trending up over 3 years. Still normal range. Diet and activity intervention recommended.</div>
+              <div class="risk-bar-bg"><div class="risk-bar-fill" style="width:35%; background:var(--amber);"></div></div>
+            </div>
+            <div class="risk-card">
+              <div class="risk-label">Alzheimer's</div>
+              <div class="risk-level low">Low</div>
+              <div class="risk-detail">ApoE status not yet tested. hs-CRP optimal. Sleep and exercise habits protective.</div>
+              <div class="risk-bar-bg"><div class="risk-bar-fill" style="width:14%; background:var(--fern);"></div></div>
+            </div>
+            <div class="risk-card">
+              <div class="risk-label">Colorectal Cancer</div>
+              <div class="risk-level low">Low</div>
+              <div class="risk-detail">No family history. Colonoscopy not yet done — schedule by age 45.</div>
+              <div class="risk-bar-bg"><div class="risk-bar-fill" style="width:18%; background:var(--fern);"></div></div>
+            </div>
+            <div class="risk-card">
+              <div class="risk-label">Anemia</div>
+              <div class="risk-level low">Low</div>
+              <div class="risk-detail">Ferritin, B12, and CBC all within optimal range. Last checked Apr 2026.</div>
+              <div class="risk-bar-bg"><div class="risk-bar-fill" style="width:10%; background:var(--fern);"></div></div>
+            </div>
+            <div class="risk-card">
+              <div class="risk-label">Thyroid</div>
+              <div class="risk-level low">Low</div>
+              <div class="risk-detail">TSH stable at 1.8. Full thyroid panel normal. Annual monitoring.</div>
+              <div class="risk-bar-bg"><div class="risk-bar-fill" style="width:8%; background:var(--fern);"></div></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- CONDITIONS + APPOINTMENTS -->
+      <div class="two-col" style="margin-top:24px;">
+
+        <div class="list-card">
+          <div class="list-card-header">
+            <div class="list-card-title">Conditions & injuries</div>
+            <div class="list-card-action">View all</div>
+          </div>
+          <div class="list-row">
+            <div class="list-icon amber"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h4l2-5 4 10 2-5h6"/></svg></div>
+            <div class="list-main">
+              <div class="list-title">Mild hypertension</div>
+              <div class="list-sub">Diagnosed Feb 2023 · Lifestyle managed</div>
+            </div>
+            <div class="list-right"><span class="list-tag managed">Managed</span></div>
+          </div>
+          <div class="list-row">
+            <div class="list-icon amber"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/></svg></div>
+            <div class="list-main">
+              <div class="list-title">Elevated ApoB / dyslipidemia</div>
+              <div class="list-sub">Diagnosed Apr 2026 · Under review</div>
+            </div>
+            <div class="list-right"><span class="list-tag watch">Watch</span></div>
+          </div>
+          <div class="list-row">
+            <div class="list-icon slate"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3v7l-2 4v7M15 3v7l2 4v7M7 14h10"/></svg></div>
+            <div class="list-main">
+              <div class="list-title">Left knee strain</div>
+              <div class="list-sub">Dec 2024 · Physiotherapy completed</div>
+            </div>
+            <div class="list-right"><span class="list-tag resolved">Resolved</span></div>
+          </div>
+          <div class="list-row">
+            <div class="list-icon slate"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21V11M12 11c0-4 3-7 7-8-1 4-3 7-7 8zM12 14c0-3-2-5-6-6 1 3 3 5 6 6z"/></svg></div>
+            <div class="list-main">
+              <div class="list-title">Seasonal allergies — tree pollen</div>
+              <div class="list-sub">Perennial · Cetirizine as needed</div>
+            </div>
+            <div class="list-right"><span class="list-tag managed">Managed</span></div>
+          </div>
+        </div>
+
+        <div class="list-card">
+          <div class="list-card-header">
+            <div class="list-card-title">Appointments</div>
+            <div class="list-card-action">Book new</div>
+          </div>
+          <div class="appt-row">
+            <div class="appt-date-block">
+              <div class="appt-day">3</div>
+              <div class="appt-month">May</div>
+            </div>
+            <div class="appt-divider"></div>
+            <div class="appt-main">
+              <div class="appt-title">Annual Health Exam — Follow-up</div>
+              <div class="appt-with">Dr. Demo Physician · ApoB results review</div>
+            </div>
+            <span class="appt-type">Upcoming</span>
+          </div>
+          <div class="appt-row">
+            <div class="appt-date-block">
+              <div class="appt-day">10</div>
+              <div class="appt-month">Apr</div>
+            </div>
+            <div class="appt-divider"></div>
+            <div class="appt-main">
+              <div class="appt-title">Annual Health Exam</div>
+              <div class="appt-with">Dr. Demo Physician · Full panel bloodwork</div>
+            </div>
+            <span class="appt-type past">Complete</span>
+          </div>
+          <div class="appt-row">
+            <div class="appt-date-block">
+              <div class="appt-day">12</div>
+              <div class="appt-month">Feb</div>
+            </div>
+            <div class="appt-divider"></div>
+            <div class="appt-main">
+              <div class="appt-title">Bloodwork Review</div>
+              <div class="appt-with">Dr. Demo Physician · Virtual</div>
+            </div>
+            <span class="appt-type past">Complete</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- REFERRALS -->
+      <div class="section-row" style="margin-top:24px;">
+        <div class="section-title">Referrals</div>
+        <div class="section-link">All referrals →</div>
+      </div>
+      <div class="list-card">
+        <div class="ref-row">
+          <div class="ref-circle">C</div>
+          <div class="ref-main">
+            <div class="ref-title">Cardiology, Demo Heart Clinic</div>
+            <div class="ref-detail">Referred Apr 2026 · ApoB and cardiovascular risk review</div>
+          </div>
+          <span class="ref-status active">Pending</span>
+        </div>
+        <div class="ref-row">
+          <div class="ref-circle">P</div>
+          <div class="ref-main">
+            <div class="ref-title">Physiotherapy, Demo Physio Clinic</div>
+            <div class="ref-detail">Referred Jan 2025 · Left knee strain · 6 sessions</div>
+          </div>
+          <span class="ref-status complete">Complete</span>
+        </div>
+        <div class="ref-row">
+          <div class="ref-circle">D</div>
+          <div class="ref-main">
+            <div class="ref-title">Dermatology, mole mapping</div>
+            <div class="ref-detail">Referred Mar 2025 · Routine skin check · Annual</div>
+          </div>
+          <span class="ref-status complete">Complete</span>
+        </div>
+      </div>
+
+    </div><!-- /content dashboard -->
+
+    <!-- BIOMARKERS VIEW -->
+    <div class="content" id="view-biomarkers" style="display:none;">
+      <div class="section-row" style="margin-bottom:20px;"><div class="section-title" style="font-size:18px;">Biomarkers</div></div>
+      <div class="tabs" id="bio-tabs">
+        <div class="tab-item active" onclick="switchBioTab('metabolic',this)">Metabolic</div>
+        <div class="tab-item" onclick="switchBioTab('hormonal',this)">Hormonal</div>
+        <div class="tab-item" onclick="switchBioTab('inflammatory',this)">Inflammatory</div>
+        <div class="tab-item" onclick="switchBioTab('nutritional',this)">Nutritional</div>
+        <div class="tab-item" onclick="switchBioTab('thyroid',this)">Thyroid</div>
+        <div class="tab-item" onclick="switchBioTab('kidney',this)">Kidney & Liver</div>
+      </div>
+      <div id="bio-metabolic">
+        <div class="biomarker-grid">
+          <div class="biomarker-card">
+            <div class="bm-header"><span class="bm-name">ApoB</span><span class="bm-status red">Elevated</span></div>
+            <div class="bm-value">1.32 <span class="bm-unit">g/L</span></div>
+            <div class="bm-range">Optimal: &lt;0.9 g/L</div>
+            <div class="bm-trend">↑ from 1.18 (Apr 2025)</div>
+            <div class="sparkline" style="margin-top:8px;">
+              <div class="spark-bar active-green" style="height:8px"></div><div class="spark-bar active-green" style="height:10px"></div><div class="spark-bar active-green" style="height:9px"></div><div class="spark-bar active-amber" style="height:13px"></div><div class="spark-bar active-red" style="height:18px"></div>
+            </div>
+          </div>
+          <div class="biomarker-card">
+            <div class="bm-header"><span class="bm-name">HbA1c</span><span class="bm-status green">Optimal</span></div>
+            <div class="bm-value">5.2 <span class="bm-unit">%</span></div>
+            <div class="bm-range">Optimal: &lt;5.7%</div>
+            <div class="bm-trend">↔ Stable</div>
+            <div class="sparkline" style="margin-top:8px;">
+              <div class="spark-bar active-green" style="height:14px"></div><div class="spark-bar active-green" style="height:13px"></div><div class="spark-bar active-green" style="height:14px"></div><div class="spark-bar active-green" style="height:13px"></div><div class="spark-bar active-green" style="height:14px"></div>
+            </div>
+          </div>
+          <div class="biomarker-card">
+            <div class="bm-header"><span class="bm-name">Fasting Glucose</span><span class="bm-status amber">Watch</span></div>
+            <div class="bm-value">5.9 <span class="bm-unit">mmol/L</span></div>
+            <div class="bm-range">Optimal: &lt;5.6</div>
+            <div class="bm-trend">↑ from 5.7 (Apr 2025)</div>
+            <div class="sparkline" style="margin-top:8px;">
+              <div class="spark-bar active-green" style="height:10px"></div><div class="spark-bar active-green" style="height:11px"></div><div class="spark-bar active-green" style="height:12px"></div><div class="spark-bar active-amber" style="height:14px"></div><div class="spark-bar active-amber" style="height:16px"></div>
+            </div>
+          </div>
+          <div class="biomarker-card">
+            <div class="bm-header"><span class="bm-name">LDL-C</span><span class="bm-status amber">Watch</span></div>
+            <div class="bm-value">3.1 <span class="bm-unit">mmol/L</span></div>
+            <div class="bm-range">Optimal: &lt;2.6</div>
+            <div class="bm-trend">↓ from 3.4 (Apr 2025)</div>
+            <div class="sparkline" style="margin-top:8px;">
+              <div class="spark-bar active-red" style="height:18px"></div><div class="spark-bar active-amber" style="height:16px"></div><div class="spark-bar active-amber" style="height:15px"></div><div class="spark-bar active-amber" style="height:14px"></div><div class="spark-bar active-amber" style="height:13px"></div>
+            </div>
+          </div>
+          <div class="biomarker-card">
+            <div class="bm-header"><span class="bm-name">HDL-C</span><span class="bm-status green">Optimal</span></div>
+            <div class="bm-value">1.4 <span class="bm-unit">mmol/L</span></div>
+            <div class="bm-range">Optimal: &gt;1.2</div>
+            <div class="bm-trend">↔ Stable</div>
+            <div class="sparkline" style="margin-top:8px;">
+              <div class="spark-bar active-green" style="height:13px"></div><div class="spark-bar active-green" style="height:14px"></div><div class="spark-bar active-green" style="height:13px"></div><div class="spark-bar active-green" style="height:14px"></div><div class="spark-bar active-green" style="height:14px"></div>
+            </div>
+          </div>
+          <div class="biomarker-card">
+            <div class="bm-header"><span class="bm-name">Triglycerides</span><span class="bm-status green">Optimal</span></div>
+            <div class="bm-value">1.1 <span class="bm-unit">mmol/L</span></div>
+            <div class="bm-range">Optimal: &lt;1.7</div>
+            <div class="bm-trend">↓ from 1.3 (Apr 2025)</div>
+            <div class="sparkline" style="margin-top:8px;">
+              <div class="spark-bar active-amber" style="height:14px"></div><div class="spark-bar active-green" style="height:13px"></div><div class="spark-bar active-green" style="height:12px"></div><div class="spark-bar active-green" style="height:11px"></div><div class="spark-bar active-green" style="height:10px"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="bio-hormonal" style="display:none;">
+        <div class="biomarker-grid">
+          <div class="biomarker-card">
+            <div class="bm-header"><span class="bm-name">Total Testosterone</span><span class="bm-status green">Optimal</span></div>
+            <div class="bm-value">18.4 <span class="bm-unit">nmol/L</span></div>
+            <div class="bm-range">Range: 10–35</div>
+            <div class="bm-trend">↔ Stable · mid-range</div>
+            <div class="sparkline" style="margin-top:8px;"><div class="spark-bar active-green" style="height:13px"></div><div class="spark-bar active-green" style="height:14px"></div><div class="spark-bar active-green" style="height:13px"></div><div class="spark-bar active-green" style="height:14px"></div><div class="spark-bar active-green" style="height:13px"></div></div>
+          </div>
+          <div class="biomarker-card">
+            <div class="bm-header"><span class="bm-name">DHEA-S</span><span class="bm-status green">Optimal</span></div>
+            <div class="bm-value">8.2 <span class="bm-unit">µmol/L</span></div>
+            <div class="bm-range">Age range: 4.3–12.2</div>
+            <div class="bm-trend">↔ Stable</div>
+            <div class="sparkline" style="margin-top:8px;"><div class="spark-bar active-green" style="height:13px"></div><div class="spark-bar active-green" style="height:14px"></div><div class="spark-bar active-green" style="height:13px"></div><div class="spark-bar active-green" style="height:14px"></div><div class="spark-bar active-green" style="height:13px"></div></div>
+          </div>
+          <div class="biomarker-card">
+            <div class="bm-header"><span class="bm-name">Cortisol (AM)</span><span class="bm-status green">Optimal</span></div>
+            <div class="bm-value">420 <span class="bm-unit">nmol/L</span></div>
+            <div class="bm-range">Optimal: 170–540</div>
+            <div class="bm-trend">↔ Stable</div>
+            <div class="sparkline" style="margin-top:8px;"><div class="spark-bar active-green" style="height:12px"></div><div class="spark-bar active-green" style="height:13px"></div><div class="spark-bar active-green" style="height:14px"></div><div class="spark-bar active-green" style="height:13px"></div><div class="spark-bar active-green" style="height:13px"></div></div>
+          </div>
+        </div>
+      </div>
+      <div id="bio-inflammatory" style="display:none;">
+        <div class="biomarker-grid">
+          <div class="biomarker-card">
+            <div class="bm-header"><span class="bm-name">hs-CRP</span><span class="bm-status green">Optimal</span></div>
+            <div class="bm-value">0.8 <span class="bm-unit">mg/L</span></div>
+            <div class="bm-range">Optimal: &lt;1.0</div>
+            <div class="bm-trend">↓ from 1.1 (Apr 2025)</div>
+            <div class="sparkline" style="margin-top:8px;"><div class="spark-bar active-amber" style="height:16px"></div><div class="spark-bar active-green" style="height:14px"></div><div class="spark-bar active-green" style="height:12px"></div><div class="spark-bar active-green" style="height:11px"></div><div class="spark-bar active-green" style="height:10px"></div></div>
+          </div>
+          <div class="biomarker-card">
+            <div class="bm-header"><span class="bm-name">Lp(a)</span><span class="bm-status green">Optimal</span></div>
+            <div class="bm-value">28 <span class="bm-unit">nmol/L</span></div>
+            <div class="bm-range">Optimal: &lt;75</div>
+            <div class="bm-trend">Genetic · stable</div>
+            <div class="sparkline" style="margin-top:8px;"><div class="spark-bar active-green" style="height:13px"></div><div class="spark-bar active-green" style="height:14px"></div><div class="spark-bar active-green" style="height:13px"></div><div class="spark-bar active-green" style="height:14px"></div><div class="spark-bar active-green" style="height:13px"></div></div>
+          </div>
+          <div class="biomarker-card">
+            <div class="bm-header"><span class="bm-name">Homocysteine</span><span class="bm-status green">Optimal</span></div>
+            <div class="bm-value">9.2 <span class="bm-unit">µmol/L</span></div>
+            <div class="bm-range">Optimal: &lt;10</div>
+            <div class="bm-trend">↓ from 11.4 (Apr 2025)</div>
+            <div class="sparkline" style="margin-top:8px;"><div class="spark-bar active-amber" style="height:14px"></div><div class="spark-bar active-amber" style="height:13px"></div><div class="spark-bar active-amber" style="height:12px"></div><div class="spark-bar active-green" style="height:11px"></div><div class="spark-bar active-green" style="height:10px"></div></div>
+          </div>
+        </div>
+      </div>
+      <div id="bio-nutritional" style="display:none;">
+        <div class="biomarker-grid">
+          <div class="biomarker-card"><div class="bm-header"><span class="bm-name">Vitamin D</span><span class="bm-status green">Optimal</span></div><div class="bm-value">88 <span class="bm-unit">nmol/L</span></div><div class="bm-range">Optimal: 75–200</div><div class="bm-trend">↑ from 70 (Apr 2025) · supplement</div></div>
+          <div class="biomarker-card"><div class="bm-header"><span class="bm-name">B12</span><span class="bm-status green">Optimal</span></div><div class="bm-value">412 <span class="bm-unit">pmol/L</span></div><div class="bm-range">Optimal: 200–900</div><div class="bm-trend">↔ Stable</div></div>
+          <div class="biomarker-card"><div class="bm-header"><span class="bm-name">Ferritin</span><span class="bm-status green">Optimal</span></div><div class="bm-value">88 <span class="bm-unit">µg/L</span></div><div class="bm-range">Optimal: 50–200</div><div class="bm-trend">↔ Stable</div></div>
+          <div class="biomarker-card"><div class="bm-header"><span class="bm-name">Magnesium</span><span class="bm-status green">Optimal</span></div><div class="bm-value">0.88 <span class="bm-unit">mmol/L</span></div><div class="bm-range">Optimal: 0.75–1.0</div><div class="bm-trend">↔ Stable</div></div>
+        </div>
+      </div>
+      <div id="bio-thyroid" style="display:none;">
+        <div class="biomarker-grid">
+          <div class="biomarker-card"><div class="bm-header"><span class="bm-name">TSH</span><span class="bm-status green">Optimal</span></div><div class="bm-value">1.8 <span class="bm-unit">mU/L</span></div><div class="bm-range">Range: 0.4–4.0</div><div class="bm-trend">↔ Stable</div></div>
+          <div class="biomarker-card"><div class="bm-header"><span class="bm-name">Free T4</span><span class="bm-status green">Optimal</span></div><div class="bm-value">14.2 <span class="bm-unit">pmol/L</span></div><div class="bm-range">Optimal: 10–20</div><div class="bm-trend">↔ Stable</div></div>
+          <div class="biomarker-card"><div class="bm-header"><span class="bm-name">Free T3</span><span class="bm-status green">Optimal</span></div><div class="bm-value">4.8 <span class="bm-unit">pmol/L</span></div><div class="bm-range">Optimal: 3.5–6.5</div><div class="bm-trend">↔ Stable</div></div>
+        </div>
+      </div>
+      <div id="bio-kidney" style="display:none;">
+        <div class="biomarker-grid">
+          <div class="biomarker-card"><div class="bm-header"><span class="bm-name">eGFR</span><span class="bm-status green">Optimal</span></div><div class="bm-value">88 <span class="bm-unit">mL/min</span></div><div class="bm-range">Optimal: &gt;60</div><div class="bm-trend">↔ Stable</div></div>
+          <div class="biomarker-card"><div class="bm-header"><span class="bm-name">Creatinine</span><span class="bm-status green">Optimal</span></div><div class="bm-value">88 <span class="bm-unit">µmol/L</span></div><div class="bm-range">Optimal: 60–110</div><div class="bm-trend">↔ Stable</div></div>
+          <div class="biomarker-card"><div class="bm-header"><span class="bm-name">ALT</span><span class="bm-status amber">Watch</span></div><div class="bm-value">42 <span class="bm-unit">U/L</span></div><div class="bm-range">Optimal: &lt;35</div><div class="bm-trend">↓ from 58 (Apr 2025)</div></div>
+          <div class="biomarker-card"><div class="bm-header"><span class="bm-name">AST</span><span class="bm-status green">Optimal</span></div><div class="bm-value">28 <span class="bm-unit">U/L</span></div><div class="bm-range">Optimal: &lt;40</div><div class="bm-trend">↔ Stable</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- APPOINTMENTS VIEW -->
+    <div class="content" id="view-appointments" style="display:none;">
+      <div class="section-row" style="margin-bottom:20px;"><div class="section-title" style="font-size:18px;">Appointments</div><button class="btn-primary" style="font-size:12px;padding:6px 14px;">Book New</button></div>
+      <div style="background:var(--surface);border-radius:12px;padding:20px;margin-bottom:12px;border-left:4px solid var(--forest);">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+          <div>
+            <div style="font-weight:600;font-size:14px;margin-bottom:4px;">Follow-up: ApoB results review</div>
+            <div style="color:var(--muted);font-size:12px;">Dr. Demo Physician · Demo Clinic</div>
+            <div style="color:var(--muted);font-size:12px;margin-top:2px;">May 3, 2026 · 9:00 AM · In-person</div>
+          </div>
+          <span style="background:var(--mint);color:var(--forest);font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px;">Upcoming</span>
+        </div>
+        <div style="margin-top:12px;display:flex;gap:8px;">
+          <button class="btn-secondary" style="font-size:11px;padding:4px 12px;">Reschedule</button>
+          <button class="btn-secondary" style="font-size:11px;padding:4px 12px;">Cancel</button>
+        </div>
+      </div>
+      <div style="background:var(--surface);border-radius:12px;padding:20px;margin-bottom:12px;opacity:0.7;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+          <div>
+            <div style="font-weight:600;font-size:14px;margin-bottom:4px;">Annual Health Exam</div>
+            <div style="color:var(--muted);font-size:12px;">Dr. Demo Physician · Demo Clinic</div>
+            <div style="color:var(--muted);font-size:12px;margin-top:2px;">Apr 10, 2026 · 9:30 AM · In-person</div>
+          </div>
+          <span style="background:#f0f0f0;color:var(--muted);font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px;">Completed</span>
+        </div>
+      </div>
+      <div style="background:var(--surface);border-radius:12px;padding:20px;opacity:0.7;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+          <div>
+            <div style="font-weight:600;font-size:14px;margin-bottom:4px;">Bloodwork Review</div>
+            <div style="color:var(--muted);font-size:12px;">Dr. Demo Physician · Virtual</div>
+            <div style="color:var(--muted);font-size:12px;margin-top:2px;">Feb 12, 2026 · 10:00 AM · Virtual</div>
+          </div>
+          <span style="background:#f0f0f0;color:var(--muted);font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px;">Completed</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- MESSAGES VIEW -->
+    <div class="content" id="view-messages" style="display:none;">
+      <div class="section-row" style="margin-bottom:20px;"><div class="section-title" style="font-size:18px;">Messages</div><button class="btn-primary" style="font-size:12px;padding:6px 14px;">New Message</button></div>
+      <div style="background:var(--surface);border-radius:12px;overflow:hidden;">
+        <div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;cursor:pointer;background:var(--mint);">
+          <div style="width:38px;height:38px;border-radius:50%;background:var(--forest);display:flex;align-items:center;justify-content:center;color:white;font-size:14px;font-weight:600;flex-shrink:0;">DP</div>
+          <div style="flex:1;">
+            <div style="font-weight:600;font-size:13px;">Dr. Demo Physician</div>
+            <div style="color:var(--muted);font-size:12px;margin-top:2px;">Re: ApoB results — I've reviewed your latest panel. Your ApoB has risen to 1.32...</div>
+          </div>
+          <div style="font-size:11px;color:var(--muted);white-space:nowrap;">Apr 11</div>
+        </div>
+        <div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;cursor:pointer;">
+          <div style="width:38px;height:38px;border-radius:50%;background:var(--forest-mid);display:flex;align-items:center;justify-content:center;color:white;font-size:14px;font-weight:600;flex-shrink:0;">DC</div>
+          <div style="flex:1;">
+            <div style="font-weight:600;font-size:13px;">Demo Clinic</div>
+            <div style="color:var(--muted);font-size:12px;margin-top:2px;">Reminder: colorectal screening is recommended from age 45. Ask about it at your May visit.</div>
+          </div>
+          <div style="font-size:11px;color:var(--muted);white-space:nowrap;">Apr 8</div>
+        </div>
+        <div style="padding:16px 20px;display:flex;align-items:center;gap:12px;cursor:pointer;">
+          <div style="width:38px;height:38px;border-radius:50%;background:var(--sage);display:flex;align-items:center;justify-content:center;color:white;font-size:14px;font-weight:600;flex-shrink:0;">LA</div>
+          <div style="flex:1;">
+            <div style="font-weight:600;font-size:13px;">Lab Results</div>
+            <div style="color:var(--muted);font-size:12px;margin-top:2px;">Your Apr 10 bloodwork results are now available in your Biomarkers tab.</div>
+          </div>
+          <div style="font-size:11px;color:var(--muted);white-space:nowrap;">Apr 10</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PLACEHOLDER VIEWS -->
+    <div class="content" id="view-health-score" style="display:none;">
+      <div class="section-row" style="margin-bottom:20px;"><div class="section-title" style="font-size:18px;">Health Score</div></div>
+      <div style="background:var(--forest);border-radius:16px;padding:32px;color:white;text-align:center;max-width:400px;margin:0 auto;">
+        <div style="font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:8px;">Baseline Health Score</div>
+        <div style="font-family:'Fraunces',serif;font-size:72px;font-weight:300;line-height:1;">74</div>
+        <div style="font-size:13px;color:rgba(255,255,255,0.6);margin-top:4px;">out of 100</div>
+        <div style="margin-top:20px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.15);font-size:13px;color:rgba(255,255,255,0.7);">↑ +6 points since last year · Biological age est. 39</div>
+      </div>
+    </div>
+    <div class="content" id="view-body-comp" style="display:none;">
+      <div class="section-row" style="margin-bottom:20px;"><div class="section-title" style="font-size:18px;">Body Composition</div></div>
+      <div class="biomarker-grid">
+        <div class="biomarker-card"><div class="bm-header"><span class="bm-name">Body Fat %</span><span class="bm-status green">Healthy</span></div><div class="bm-value">19.2 <span class="bm-unit">%</span></div><div class="bm-range">Healthy: 12–22%</div><div class="bm-trend">↓ from 20.6 (Apr 2025)</div></div>
+        <div class="biomarker-card"><div class="bm-header"><span class="bm-name">Muscle Mass</span><span class="bm-status green">Optimal</span></div><div class="bm-value">38.4 <span class="bm-unit">kg</span></div><div class="bm-range">Skeletal muscle · normal</div><div class="bm-trend">↑ from 37.6 (Apr 2025)</div></div>
+        <div class="biomarker-card"><div class="bm-header"><span class="bm-name">VO₂ Max</span><span class="bm-status green">Above average</span></div><div class="bm-value">44 <span class="bm-unit">mL/kg/min</span></div><div class="bm-range">Above average for age</div><div class="bm-trend">↑ from 41 (Apr 2025)</div></div>
+        <div class="biomarker-card"><div class="bm-header"><span class="bm-name">Resting HR</span><span class="bm-status green">Optimal</span></div><div class="bm-value">62 <span class="bm-unit">bpm</span></div><div class="bm-range">Optimal: 50–65</div><div class="bm-trend">↓ 3 bpm over 90 days · wearable</div></div>
+        <div class="biomarker-card"><div class="bm-header"><span class="bm-name">HRV</span><span class="bm-status green">Optimal</span></div><div class="bm-value">42 <span class="bm-unit">ms</span></div><div class="bm-range">7-day average</div><div class="bm-trend">↑ 4 ms over 90 days · wearable</div></div>
+        <div class="biomarker-card"><div class="bm-header"><span class="bm-name">Sleep</span><span class="bm-status amber">Watch</span></div><div class="bm-value">7.0 <span class="bm-unit">h avg</span></div><div class="bm-range">Goal: 7–9 h</div><div class="bm-trend">Under 7 h on 16 of 30 nights · wearable</div></div>
+      </div>
+    </div>
+    <div class="content" id="view-risk" style="display:none;">
+      <div class="section-row" style="margin-bottom:20px;"><div class="section-title" style="font-size:18px;">Risk Trends</div></div>
+      <div class="risk-grid">
+        <div class="risk-card"><div class="risk-name">Cardiovascular</div><div class="risk-level amber">Moderate</div><div class="risk-detail">10-yr Framingham risk: 8.4%. ApoB elevated. Review at your May appointment.</div></div>
+        <div class="risk-card"><div class="risk-name">Type 2 Diabetes</div><div class="risk-level amber">Watch</div><div class="risk-detail">Fasting glucose trending up. HbA1c normal. Lifestyle intervention recommended.</div></div>
+        <div class="risk-card"><div class="risk-name">Colorectal Cancer</div><div class="risk-level amber">Plan ahead</div><div class="risk-detail">Screening starts at 45. Worth discussing with your physician at your next visit.</div></div>
+        <div class="risk-card"><div class="risk-name">Thyroid</div><div class="risk-level green">Low</div><div class="risk-detail">TSH, T3, T4 all optimal. Annual monitoring.</div></div>
+        <div class="risk-card"><div class="risk-name">Anemia</div><div class="risk-level green">Low</div><div class="risk-detail">Ferritin and CBC normal. No signs of iron deficiency.</div></div>
+        <div class="risk-card"><div class="risk-name">Alzheimer's</div><div class="risk-level green">Low</div><div class="risk-detail">ApoE status not yet tested. hs-CRP optimal. Sleep and exercise habits protective.</div></div>
+      </div>
+    </div>
+    <div class="content" id="view-conditions" style="display:none;">
+      <div class="section-row" style="margin-bottom:20px;"><div class="section-title" style="font-size:18px;">Conditions</div></div>
+      <div style="background:var(--surface);border-radius:12px;padding:20px;margin-bottom:12px;"><div style="font-weight:600;margin-bottom:4px;">Elevated ApoB / dyslipidemia</div><div style="font-size:12px;color:var(--muted);">Diagnosed Apr 2026 · Under review · Cardiology referral pending</div></div>
+      <div style="background:var(--surface);border-radius:12px;padding:20px;margin-bottom:12px;"><div style="font-weight:600;margin-bottom:4px;">Mild hypertension</div><div style="font-size:12px;color:var(--muted);">Diagnosed Feb 2023 · Lifestyle managed</div></div>
+      <div style="background:var(--surface);border-radius:12px;padding:20px;margin-bottom:12px;"><div style="font-weight:600;margin-bottom:4px;">Seasonal allergies, tree pollen</div><div style="font-size:12px;color:var(--muted);">Perennial · Cetirizine as needed</div></div>
+      <div style="background:var(--surface);border-radius:12px;padding:20px;opacity:0.7;"><div style="font-weight:600;margin-bottom:4px;">Left knee strain</div><div style="font-size:12px;color:var(--muted);">Dec 2024 · Physiotherapy completed · Resolved</div></div>
+    </div>
+    <div class="content" id="view-referrals" style="display:none;">
+      <div class="section-row" style="margin-bottom:20px;"><div class="section-title" style="font-size:18px;">Referrals</div></div>
+      <div class="ref-row" style="background:var(--surface);border-radius:12px;padding:16px;margin-bottom:8px;"><div class="ref-circle">C</div><div class="ref-main"><div class="ref-title">Cardiology, Demo Heart Clinic</div><div class="ref-detail">Referred Apr 2026 · ApoB and cardiovascular risk review · Awaiting booking</div></div><span class="ref-status active">Pending</span></div>
+      <div class="ref-row" style="background:var(--surface);border-radius:12px;padding:16px;margin-bottom:8px;opacity:0.7;"><div class="ref-circle">P</div><div class="ref-main"><div class="ref-title">Physiotherapy, Demo Physio Clinic</div><div class="ref-detail">Referred Jan 2025 · Left knee strain · 6 sessions</div></div><span class="ref-status complete">Complete</span></div>
+      <div class="ref-row" style="background:var(--surface);border-radius:12px;padding:16px;opacity:0.7;"><div class="ref-circle">D</div><div class="ref-main"><div class="ref-title">Dermatology, mole mapping</div><div class="ref-detail">Referred Mar 2025 · Routine skin check · Annual</div></div><span class="ref-status complete">Complete</span></div>
+    </div>
+    <div class="content" id="view-care-team" style="display:none;">
+      <div class="section-row" style="margin-bottom:20px;"><div class="section-title" style="font-size:18px;">My Care Team</div></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div style="background:var(--surface);border-radius:12px;padding:20px;"><div style="font-weight:600;margin-bottom:2px;">Dr. Demo Physician</div><div style="font-size:12px;color:var(--muted);">Family Physician · Demo Clinic</div><div style="margin-top:10px;"><button class="btn-secondary" style="font-size:11px;padding:5px 12px;">Send Message</button></div></div>
+        <div style="background:var(--surface);border-radius:12px;padding:20px;"><div style="font-weight:600;margin-bottom:2px;">Dr. Demo Cardiologist</div><div style="font-size:12px;color:var(--muted);">Cardiologist · Demo Heart Clinic · Referral pending</div><div style="margin-top:10px;"><button class="btn-secondary" style="font-size:11px;padding:5px 12px;">Send Message</button></div></div>
+      </div>
+    </div>
+    <div class="content" id="view-request-tests" style="display:none;">
+      <div class="section-row" style="margin-bottom:20px;"><div class="section-title" style="font-size:18px;">Suggested Tests</div></div>
+      <div style="background:var(--surface);border-radius:12px;padding:24px;max-width:480px;">
+        <div style="font-size:13px;color:var(--muted);margin-bottom:16px;">Based on your results and risk trends, these tests are suggested. Choose the ones you want to discuss. Your physician decides what is ordered.</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;"><input type="checkbox" checked> <span>ApoB</span></label>
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;"><input type="checkbox" checked> <span>HbA1c + fasting glucose</span></label>
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;"><input type="checkbox"> <span>Total testosterone + free testosterone</span></label>
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;"><input type="checkbox"> <span>Vitamin D</span></label>
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;"><input type="checkbox"> <span>hs-CRP</span></label>
+          <label style="display:flex;align-items:center;gap:10px;cursor:pointer;"><input type="checkbox"> <span>CBC</span></label>
+        </div>
+        <button class="btn-primary" style="margin-top:20px;width:100%;">Send to my physician for review</button>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<style>
+.biomarker-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+.biomarker-card { background:var(--surface); border-radius:12px; padding:16px; }
+.bm-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+.bm-name { font-weight:600; font-size:12px; color:var(--ink); }
+.bm-status { font-size:10px; font-weight:600; padding:2px 8px; border-radius:10px; }
+.bm-status.red { background:#fde8e8; color:#c0392b; }
+.bm-status.amber { background:#fef3dc; color:#8a5800; }
+.bm-status.green { background:var(--mint); color:var(--forest); }
+.bm-value { font-family:'Fraunces',serif; font-size:24px; font-weight:300; color:var(--ink); }
+.bm-unit { font-family:'DM Sans',sans-serif; font-size:12px; color:var(--muted); }
+.bm-range { font-size:11px; color:var(--muted); margin-top:2px; }
+.bm-trend { font-size:11px; color:var(--forest-mid); margin-top:4px; font-weight:500; }
+.risk-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+.risk-card { background:var(--surface); border-radius:12px; padding:16px; }
+.risk-name { font-weight:600; font-size:13px; margin-bottom:6px; }
+.risk-level { font-size:11px; font-weight:700; padding:2px 10px; border-radius:10px; display:inline-block; margin-bottom:8px; }
+.risk-level.red { background:#fde8e8; color:#c0392b; }
+.risk-level.amber { background:#fef3dc; color:#8a5800; }
+.risk-level.green { background:var(--mint); color:var(--forest); }
+.risk-detail { font-size:12px; color:var(--muted); line-height:1.5; }
+</style>
+
+<script>
+const navMap = {
+  'Dashboard': 'dashboard',
+  'Health Score': 'health-score',
+  'Biomarkers': 'biomarkers',
+  'Body Composition': 'body-comp',
+  'Risk Trends': 'risk',
+  'Conditions': 'conditions',
+  'Appointments': 'appointments',
+  'Referrals': 'referrals',
+  'My Care Team': 'care-team',
+  'Suggested Tests': 'request-tests',
+  'Messages': 'messages'
+};
+
+function showView(viewId) {
+  document.querySelectorAll('.content').forEach(el => el.style.display = 'none');
+  const target = document.getElementById('view-' + viewId) || document.querySelector('.content');
+  if (target) target.style.display = 'block';
+}
+
+document.querySelectorAll('.nav-item').forEach(item => {
+  item.style.cursor = 'pointer';
+  item.addEventListener('click', function() {
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    this.classList.add('active');
+    const label = this.querySelector('.nav-text').textContent.trim();
+    const viewId = navMap[label] || 'dashboard';
+    showView(viewId);
+  });
+});
+
+// Dashboard content div already has id="view-dashboard"
+
+function switchBioTab(tabId, el) {
+  document.querySelectorAll('#view-biomarkers [id^="bio-"]').forEach(t => t.style.display = 'none');
+  document.getElementById('bio-' + tabId).style.display = 'block';
+  document.querySelectorAll('#bio-tabs .tab-item').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// Mobile nav toggle
+const hamburger = document.getElementById('hamburger');
+const sidebar = document.querySelector('.sidebar');
+const overlay = document.getElementById('overlay');
+
+function openSidebar() {
+  sidebar.classList.add('open');
+  overlay.classList.add('visible');
+  document.body.style.overflow = 'hidden';
+}
+function closeSidebar() {
+  sidebar.classList.remove('open');
+  overlay.classList.remove('visible');
+  document.body.style.overflow = '';
+}
+if (hamburger) {
+  hamburger.addEventListener('click', () => sidebar.classList.contains('open') ? closeSidebar() : openSidebar());
+}
+if (overlay) {
+  overlay.addEventListener('click', closeSidebar);
+}
+// Close sidebar on nav item click (mobile)
+document.querySelectorAll('.nav-item').forEach(item => {
+  item.addEventListener('click', () => {
+    if (window.innerWidth <= 768) closeSidebar();
+  });
+});
+
+(function(){
+  var steps = [
+    ['Dashboard','<b>One screen, one answer.</b> The home view leads with a single health score and the two or three items that need attention, instead of a wall of lab values.'],
+    ['Biomarkers','<b>Results in context.</b> Each marker shows where you sit against an optimal range, not just the lab reference range, and how it has moved over time.'],
+    ['Risk Trends','<b>Trends over snapshots.</b> Risk is shown as direction of travel, which is what a patient can actually act on.'],
+    ['Suggested Tests','<b>Recommend, don\'t order.</b> The dashboard suggests the next test from the patient\'s own results and sends it to the physician for review. The physician decides, so clinical judgement stays where it belongs.'],
+    ['Appointments','<b>Connected to care.</b> Follow-ups, referrals and the care team sit beside the data they relate to.']
+  ];
+  var i = 0, box = document.getElementById('proto-tour');
+  function go(label){
+    var items = document.querySelectorAll('.nav-item');
+    for (var k=0;k<items.length;k++){
+      var t = items[k].querySelector('.nav-text');
+      if (t && t.textContent.trim()===label){ items[k].click(); break; }
+    }
+  }
+  function render(){
+    go(steps[i][0]);
+    document.getElementById('proto-tour-text').innerHTML = steps[i][1];
+    document.getElementById('pt-count').textContent = (i+1)+' / '+steps.length;
+    document.getElementById('pt-back').style.visibility = i===0?'hidden':'visible';
+    document.getElementById('pt-next').textContent = i===steps.length-1?'Finish':'Next';
+  }
+  function start(){ i=0; box.style.display='block'; render(); }
+  function stop(){ box.style.display='none'; go('Dashboard'); }
+  document.getElementById('pt-next').onclick=function(){ if(i===steps.length-1){stop();} else {i++;render();} };
+  document.getElementById('pt-back').onclick=function(){ if(i>0){i--;render();} };
+  document.getElementById('pt-exit').onclick=stop;
+  document.getElementById('proto-tour-btn').onclick=start;
+  document.getElementById('pw-tour').onclick=function(){ document.getElementById('proto-welcome').style.display='none'; start(); };
+  document.getElementById('pw-explore').onclick=function(){ document.getElementById('proto-welcome').style.display='none'; };
+})();
+</script>
+</body>
+</html>
