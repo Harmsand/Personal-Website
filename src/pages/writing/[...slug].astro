@@ -1,0 +1,72 @@
+---
+// One file serves both /writing/ (the list) and /writing/<article>/ (each article).
+// Nothing here is built unless SITE.showWriting is true in src/config.ts.
+import { getCollection, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import { SITE } from '../../config';
+
+export async function getStaticPaths() {
+  if (!SITE.showWriting) return [];
+
+  const articles = (await getCollection('articles', ({ data }) => !data.draft)).sort(
+    (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+  );
+
+  return [
+    { params: { slug: undefined }, props: { articles, article: null } },
+    ...articles.map((article) => ({ params: { slug: article.id }, props: { articles, article } })),
+  ];
+}
+
+const { articles, article } = Astro.props;
+const fmt = (d: Date) => d.toLocaleDateString('en-CA', { year: 'numeric', month: 'long', day: 'numeric' });
+const rendered = article ? await render(article) : null;
+const Content = rendered?.Content;
+---
+
+{
+  article && Content ? (
+    <Base title={`${article.data.title} | ${SITE.name}`} description={article.data.description}>
+      <article class="wrap post">
+        <p class="meta">
+          <a href="/writing/">Writing</a> · {fmt(article.data.date)}
+        </p>
+        <h1>{article.data.title}</h1>
+        <p class="standfirst">{article.data.description}</p>
+        <div class="prose">
+          <Content />
+        </div>
+      </article>
+    </Base>
+  ) : (
+    <Base title={`Writing | ${SITE.name}`}>
+      <section class="wrap post">
+        <h1>Writing</h1>
+        <ul class="list">
+          {articles.map((a) => (
+            <li>
+              <a href={`/writing/${a.id}/`}>{a.data.title}</a>
+              <span class="date">{fmt(a.data.date)}</span>
+              <p>{a.data.description}</p>
+            </li>
+          ))}
+        </ul>
+      </section>
+    </Base>
+  )
+}
+
+<style>
+  .post { max-width: 42rem; padding-block: 4rem 0; }
+  .meta { color: var(--muted); font-size: 0.9rem; margin: 0 0 1rem; }
+  h1 { font-size: clamp(2rem, 4.5vw, 2.8rem); }
+  .standfirst { font-size: 1.2rem; color: var(--muted); margin: 1rem 0 2.5rem; }
+  .prose :global(h2) { font-size: 1.6rem; margin: 2.5rem 0 0.75rem; }
+  .prose :global(p), .prose :global(li) { font-size: 1.1rem; }
+  .prose :global(blockquote) { border-left: 3px solid var(--accent); margin: 1.5rem 0; padding-left: 1.25rem; color: var(--muted); }
+  .list { list-style: none; padding: 0; margin: 2.5rem 0 0; }
+  .list li { padding-block: 1.5rem; border-top: 1px solid var(--line); }
+  .list a { font-family: var(--serif); font-size: 1.4rem; text-decoration: none; }
+  .list .date { display: block; color: var(--muted); font-size: 0.85rem; margin-top: 0.25rem; }
+  .list p { margin: 0.5rem 0 0; color: var(--muted); }
+</style>

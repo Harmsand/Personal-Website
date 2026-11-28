@@ -1,0 +1,151 @@
+---
+// Documents arrive, AI groups and classifies them, AI reads the text (OCR),
+// and decision-ready fields go into the system. Pure SVG + CSS, no JS.
+// With reduced motion on, it shows a still diagram.
+---
+
+<figure class="docflow">
+  <svg viewBox="0 0 600 290" role="img" aria-labelledby="df-title">
+    <title id="df-title">
+      Documents arrive, AI groups them and classifies each type, AI reads the text, and the system receives decision-ready fields.
+    </title>
+
+    <!-- Grouping trays -->
+    <path class="thin" d="M244 120 H306 M244 246 H306" />
+
+    <!-- OCR zone brackets -->
+    <path class="thin" d="M350 40 v-8 h10 M420 40 v-8 h-10 M350 246 v8 h10 M420 246 v8 h-10" />
+    <line class="scan" x1="352" y1="36" x2="352" y2="250" />
+
+    <!-- System -->
+    <g class="system">
+      <rect x="470" y="84" width="110" height="132" rx="4" />
+      <path d="M470 104 H580" />
+      <circle cx="480" cy="94" r="2.5" />
+      <circle cx="489" cy="94" r="2.5" />
+      <circle cx="498" cy="94" r="2.5" />
+      <path class="row r1" d="M484 122 H560" />
+      <path class="row r2" d="M484 138 H548" />
+      <path class="row r3" d="M484 154 H556" />
+      <circle cx="525" cy="188" r="14" />
+      <path class="check" d="M518 188 l5 5 l9 -10" />
+    </g>
+
+    <!-- Documents (drawn at local 0,0; moved by CSS) -->
+    <g class="doc a">
+      <path class="page" d="M0 0 H30 L40 10 V52 H0 Z" />
+      <path class="fold" d="M30 0 V10 H40" />
+      <path class="txt" d="M6 18 H32 M6 26 H34 M6 34 H28 M6 42 H32" />
+    </g>
+    <g class="doc b">
+      <path class="page" d="M0 0 H30 L40 10 V52 H0 Z" />
+      <path class="fold" d="M30 0 V10 H40" />
+      <path class="mark" d="M6 20 h28 v18 h-28 Z M6 26 H34 M6 32 H34 M20 20 V38" />
+      <path class="txt" d="M6 12 H24 M20 45 H34" />
+    <path class="tag" d="M44 6 h12 l4 5 l-4 5 h-12 Z" />
+    </g>
+    <g class="doc c">
+      <path class="page" d="M0 0 H30 L40 10 V52 H0 Z" />
+      <path class="fold" d="M30 0 V10 H40" />
+      <path class="mark" d="M12 10 V22 M6 16 H18" />
+      <path class="txt" d="M6 32 H34 M6 40 H30 M6 47 H24" />
+    <path class="tag" d="M44 6 h12 l4 5 l-4 5 h-12 Z" />
+    </g>
+
+    <!-- AI step, drawn last so documents pass behind it -->
+    <g class="ai">
+      <rect x="148" y="100" width="64" height="100" rx="4" />
+      <text x="180" y="156" text-anchor="middle">AI</text>
+    </g>
+
+    <g class="labels">
+      <text x="50" y="280">Documents arrive</text>
+      <text x="180" y="280">AI grouping</text>
+      <text x="278" y="280">Classification</text>
+      <text x="385" y="280">AI text reading</text>
+      <text x="525" y="280">Decision-ready fields</text>
+    </g>
+  </svg>
+</figure>
+
+<style>
+  .docflow { margin: 0; }
+  svg { display: block; width: 100%; height: auto; overflow: visible; }
+
+  svg * { fill: none; stroke: var(--ink); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+  .thin { stroke: var(--border); }
+  .page, .ai rect, .system rect { fill: var(--paper); }
+  .ai text { fill: var(--ink); stroke: none; font-family: var(--font-head); font-weight: 600; font-size: 18px; }
+  .labels text { fill: var(--muted); stroke: none; font-family: var(--font-body); font-size: 12px; text-anchor: middle; }
+  .system circle { fill: none; }
+  .check { stroke: var(--red); stroke-width: 2.5; stroke-dasharray: 30; stroke-dashoffset: 0; }
+  .row { stroke-dasharray: 80; stroke-dashoffset: 0; }
+  .scan { opacity: 0; stroke-width: 2; }
+
+  /* Still layout (also what reduced-motion users see) */
+  .a { transform: translate(30px, 40px) scale(1); }
+  .c { transform: translate(30px, 124px) scale(1); }
+  .b { transform: translate(30px, 208px) scale(1); }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .doc, .txt, .scan, .row, .check { animation-duration: 10s; animation-iteration-count: infinite; animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1); }
+    .a { animation-name: docA; }
+    .b { animation-name: docB; }
+    .c { animation-name: docC; }
+    .txt { animation-name: read; }
+    .scan { animation-name: scan; }
+    .row { animation-name: row; }
+    .check { animation-name: check; }
+    .tag { animation: tag 10s infinite; }
+  }
+
+  @keyframes docA {
+    0% { transform: translate(-40px, 40px) scale(1); opacity: 0; }
+    6%, 14% { transform: translate(30px, 40px) scale(1); opacity: 1; }
+    24%, 28% { transform: translate(160px, 124px) scale(1); }
+    36%, 44% { transform: translate(250px, 56px) scale(1); }
+    52%, 64% { transform: translate(360px, 56px) scale(1); opacity: 1; }
+    72%, 100% { transform: translate(505px, 130px) scale(0.5); opacity: 0; }
+  }
+  @keyframes docC {
+    0% { transform: translate(-40px, 124px) scale(1); opacity: 0; }
+    8%, 14% { transform: translate(30px, 124px) scale(1); opacity: 1; }
+    24%, 30% { transform: translate(160px, 124px) scale(1); }
+    38%, 44% { transform: translate(258px, 64px) scale(1); }
+    52%, 64% { transform: translate(368px, 64px) scale(1); opacity: 1; }
+    72%, 100% { transform: translate(505px, 130px) scale(0.5); opacity: 0; }
+  }
+  @keyframes docB {
+    0% { transform: translate(-40px, 208px) scale(1); opacity: 0; }
+    10%, 14% { transform: translate(30px, 208px) scale(1); opacity: 1; }
+    24%, 32% { transform: translate(160px, 124px) scale(1); }
+    40%, 44% { transform: translate(254px, 186px) scale(1); }
+    52%, 64% { transform: translate(364px, 186px) scale(1); opacity: 1; }
+    72%, 100% { transform: translate(505px, 130px) scale(0.5); opacity: 0; }
+  }
+  /* Text is faint until the scanner reads it */
+  @keyframes read {
+    0%, 55% { opacity: 0.25; }
+    60%, 100% { opacity: 1; }
+  }
+  @keyframes scan {
+    0%, 53% { opacity: 0; transform: translateX(0); }
+    54% { opacity: 1; transform: translateX(0); }
+    62% { opacity: 1; transform: translateX(64px); }
+    63%, 100% { opacity: 0; transform: translateX(64px); }
+  }
+  @keyframes tag {
+    0%, 39% { opacity: 0; }
+    44%, 100% { opacity: 1; }
+  }
+  @keyframes row {
+    0%, 66% { stroke-dashoffset: 80; opacity: 1; }
+    74%, 94% { stroke-dashoffset: 0; opacity: 1; }
+    100% { stroke-dashoffset: 0; opacity: 0; }
+  }
+  @keyframes check {
+    0%, 76% { stroke-dashoffset: 30; opacity: 1; }
+    84%, 94% { stroke-dashoffset: 0; opacity: 1; }
+    100% { stroke-dashoffset: 0; opacity: 0; }
+  }
+</style>
