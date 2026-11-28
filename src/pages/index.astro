@@ -21,14 +21,6 @@ const areas = [
   },
 ];
 
-const steps = [
-  { title: 'Claim arrives', note: 'Forms, reports and invoices come in' },
-  { title: 'Documents read', note: 'AI pulls out the facts' },
-  { title: 'Staff review', note: 'People check what matters' },
-  { title: 'Decision', note: 'Coverage and amounts settled' },
-  { title: 'Provider paid', note: 'Payment goes out, record kept' },
-];
-
 // Featured projects. Add one or two, then set showProjects: true in src/config.ts.
 // Each: { title, what, did, result, href, linkText }. Use only real details.
 const projects: {
@@ -66,7 +58,7 @@ const hasProfiles = SITE.linkedin || SITE.github;
     <p class="line">
       I'm a product leader who uses AI to modernize how insurers handle claims and pay healthcare providers.
     </p>
-    <p class="who">I came to insurance technology after a decade in retail operations, and I hold an MBA from UBC Sauder.</p>
+    <p class="who">I came to insurance technology after years in retail operations at Apple, and I hold an MBA from UBC Sauder.</p>
     {
       hasProfiles && (
         <ul class="profiles">
@@ -108,18 +100,6 @@ const hasProfiles = SITE.linkedin || SITE.github;
     <div class="container grid">
       <h2><span class="n">{num('work')}</span>What I do</h2>
       <div class="body">
-        <figure class="flow" aria-label="How a claim moves from intake to payment">
-          <ol>
-            {
-              steps.map((st) => (
-                <li>
-                  <strong>{st.title}</strong>
-                  <span>{st.note}</span>
-                </li>
-              ))
-            }
-          </ol>
-        </figure>
         <div class="rows">
           {
             areas.map((a) => (
@@ -168,7 +148,6 @@ const hasProfiles = SITE.linkedin || SITE.github;
           <ul class="plain">
             <li>Co-founder, Velour, a media company</li>
             <li>Sales Manager, then Inventory Supervisor, Apple, 2010 to 2016. Inventory lead for the largest Apple store in Western Canada.</li>
-            <li>Future Shop (Best Buy Canada), 2006 to 2010</li>
           </ul>
         </div>
         <div class="row">
