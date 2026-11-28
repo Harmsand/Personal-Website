@@ -173,24 +173,13 @@ const linkedinIsButton = !SITE.email && !!SITE.linkedin;
     <div class="container grid">
       <h2>Contact</h2>
       <div class="body">
-        <p class="open">
-          Open to conversations about AI in insurance and healthcare, payer and provider technology, and claims.
-        </p>
+        <p class="open">Happy to talk about AI in insurance and healthcare.</p>
         {primary && <a class="btn" href={primary.href}>{primary.text}</a>}
         {
-          hasProfiles && (
-            <ul class="profiles after">
-              {SITE.github && (
-                <li>
-                  <a href={SITE.github} rel="me">GitHub</a>
-                </li>
-              )}
-              {SITE.linkedin && !linkedinIsButton && (
-                <li>
-                  <a href={SITE.linkedin} rel="me">LinkedIn</a>
-                </li>
-              )}
-            </ul>
+          SITE.github && (
+            <p class="gh">
+              Some of what I build is on <a href={SITE.github} rel="me">GitHub</a>.
+            </p>
           )
         }
       </div>
@@ -218,7 +207,7 @@ const linkedinIsButton = !SITE.email && !!SITE.linkedin;
   .hero .who { margin: 0.75rem 0 0; max-width: 34rem; color: var(--muted); }
 
   .profiles { list-style: none; padding: 0; margin: 1.5rem 0 0; display: flex; gap: 1.5rem; }
-  .profiles.after { margin-top: 1.5rem; }
+  .gh { margin: 1.5rem 0 0; }
 
   .sec { padding-block: 4rem; }
   .sec.tint { background: var(--surface); }
