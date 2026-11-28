@@ -30,6 +30,8 @@ const projects: {
   result: string;
   href?: string;
   linkText?: string;
+  image?: string;
+  imageAlt?: string;
 }[] = [
   {
     title: 'Document intelligence for a workers\' compensation insurer',
@@ -48,6 +50,8 @@ const projects: {
       'I designed and built the clickable prototype to show what modern personal health care could look like. It combines lab results with wearable data on activity, heart rate and sleep, and shows key risks, history, upcoming appointments and suggested next steps. Suggested tests go to the physician for review rather than being ordered, so clinical judgement stays with the clinician.',
     result: 'It is a working prototype with synthetic data and a two-minute guided tour.',
     href: '/baseline/',
+    image: '/baseline/preview.jpg',
+    imageAlt: 'The Baseline dashboard: a health score of 74, the items that need attention, and wearable readings for heart rate, steps, sleep and HRV.',
     linkText: 'Open the prototype',
   },
 ];
@@ -140,10 +144,15 @@ const linkedinIsButton = !SITE.email && !!SITE.linkedin;
             {projects.map((p) => (
               <article class="project">
                 <h3>{p.title}</h3>
+                {p.image && p.href && (
+                  <a class="shot" href={p.href} aria-label={`${p.linkText ?? 'Open'}: ${p.title}`}>
+                    <img src={p.image} alt={p.imageAlt ?? ''} width="1600" height="2500" loading="lazy" decoding="async" />
+                  </a>
+                )}
                 <p>{p.what}</p>
                 <p>{p.did}</p>
                 <p>{p.result}</p>
-                {p.href && <a href={p.href}>{p.linkText ?? 'See the project'}</a>}
+                {p.href && <a class="btn" href={p.href}>{p.linkText ?? 'See the project'}</a>}
               </article>
             ))}
           </div>
@@ -260,7 +269,29 @@ const linkedinIsButton = !SITE.email && !!SITE.linkedin;
   .row p { margin: 0; max-width: 38rem; }
   .plain { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; max-width: 38rem; }
 
-  .project { max-width: 40rem; padding-bottom: 2rem; }
+  .project { max-width: 40rem; padding-bottom: 3rem; }
+  .project + .project { border-top: 1px solid var(--border); padding-top: 3rem; }
+  .project .btn { margin-top: 0.75rem; }
+  .shot {
+    display: block;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    margin: 0 0 1.5rem;
+    background: var(--surface);
+  }
+  .shot img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .shot img { transition: object-position 6s ease-in-out; }
+    .shot:hover img, .shot:focus-visible img { object-position: bottom; }
+  }
   .project h3 { font-size: 1.5rem; margin-bottom: 0.75rem; }
   .project p { margin: 0 0 0.75rem; }
 
