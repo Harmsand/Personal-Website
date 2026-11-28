@@ -14,7 +14,7 @@ export const SITE = {
   showProjects: true,
 
   // Links. Leave a value empty ('') to hide it.
-  linkedin: '', // e.g. 'https://www.linkedin.com/in/your-handle'
-  github: '', // e.g. 'https://github.com/your-username'
+  linkedin: 'https://linkedin.com/in/harmsandhu', // e.g. 'https://www.linkedin.com/in/your-handle'
+  github: 'https://github.com/Harmsand', // e.g. 'https://github.com/your-username'
   email: '', // e.g. 'hello@harmsandhu.com'
 };
