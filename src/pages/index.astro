@@ -49,6 +49,13 @@ const order = ['about', 'work', ...(showProjects ? ['projects'] : []), 'backgrou
 const num = (k: string) => String(order.indexOf(k) + 1).padStart(2, '0');
 
 const hasProfiles = SITE.linkedin || SITE.github;
+// Main contact button: email if one is set, otherwise LinkedIn (keeps the email address off the page).
+const primary = SITE.email
+  ? { href: `mailto:${SITE.email}`, text: 'Email me' }
+  : SITE.linkedin
+    ? { href: SITE.linkedin, text: 'Message me on LinkedIn' }
+    : null;
+const linkedinIsButton = !SITE.email && !!SITE.linkedin;
 ---
 
 <Base>
@@ -169,7 +176,7 @@ const hasProfiles = SITE.linkedin || SITE.github;
         <p class="open">
           Open to conversations about AI in insurance and healthcare, payer and provider technology, and claims.
         </p>
-        {SITE.email && <a class="btn" href={`mailto:${SITE.email}`}>Email me</a>}
+        {primary && <a class="btn" href={primary.href}>{primary.text}</a>}
         {
           hasProfiles && (
             <ul class="profiles after">
@@ -178,7 +185,7 @@ const hasProfiles = SITE.linkedin || SITE.github;
                   <a href={SITE.github} rel="me">GitHub</a>
                 </li>
               )}
-              {SITE.linkedin && (
+              {SITE.linkedin && !linkedinIsButton && (
                 <li>
                   <a href={SITE.linkedin} rel="me">LinkedIn</a>
                 </li>
